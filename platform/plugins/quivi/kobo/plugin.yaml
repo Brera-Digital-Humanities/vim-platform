@@ -1,0 +1,6 @@
+plugin:
+    name: 'quivi.kobo::lang.plugin.name'
+    description: 'quivi.kobo::lang.plugin.description'
+    author: Quivi
+    icon: oc-icon-columns
+    homepage: ''

@@ -1,0 +1,73 @@
+services:
+  dbvim:
+    image: mysql:8.4
+    container_name: mysql-vim
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - TZ=${TZ}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Metti qui file .sql/.sh per inizializzare (opzionale)
+      - ./initdb:/docker-entrypoint-initdb.d
+    # Espone 3306 anche sull'host (utile per client esterni).
+    # Se hai già MySQL installato localmente, COMMENTA la riga sotto.
+    ports:
+      - "3313:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin-vim
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=dbvim
+      - PMA_USER=root
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - UPLOAD_LIMIT=256M
+      - TZ=${TZ}
+    ports:
+      - "8086:80"
+    depends_on:
+      dbvim:
+        condition: service_healthy
+
+  wintercms:
+    build: ./platform
+    container_name: vim-platform
+    restart: unless-stopped
+    ports:
+      - "8085:80"      # sito Winter CMS su http://localhost:8500
+    volumes:
+      - ./platform:/var/www/html
+      - ./apache/sites-available:/etc/apache2/sites-available
+      - ./apache/htpasswd:/etc/apache2/htpasswd
+    environment:
+      - DB_HOST=dbvim
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_USER=${MYSQL_USER}
+      - DB_PASS=${MYSQL_PASSWORD}
+      - TZ=${TZ}
+    depends_on:
+      dbvim:
+        condition: service_healthy
+  composer:
+    build: ./platform
+    entrypoint: ["composer"]
+    working_dir: /platform
+    volumes:
+      - ./platform:/platform
+      
+volumes:
+  mysql_data:
