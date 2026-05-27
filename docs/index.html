@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VIM API Docs</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #1f2933;
+      --muted: #5f6b7a;
+      --line: #d8dee7;
+      --accent: #0f766e;
+      --accent-dark: #0b5f59;
+      --code-bg: #111827;
+      --code-text: #e5e7eb;
+      --warn-bg: #fff7ed;
+      --warn-line: #fdba74;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      background: #14213d;
+      color: #ffffff;
+      padding: 40px 24px;
+    }
+
+    header .inner,
+    main {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.2;
+      margin: 0 0 12px;
+    }
+
+    h1 {
+      font-size: 34px;
+    }
+
+    h2 {
+      margin-top: 36px;
+      font-size: 24px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    main {
+      padding: 28px 24px 56px;
+    }
+
+    .summary {
+      color: #d8dee7;
+      max-width: 760px;
+      margin: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .panel,
+    .endpoint,
+    .notice {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .notice {
+      background: var(--warn-bg);
+      border-color: var(--warn-line);
+    }
+
+    .endpoint {
+      margin-top: 16px;
+    }
+
+    .method {
+      display: inline-block;
+      min-width: 56px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      color: #ffffff;
+      background: var(--accent);
+    }
+
+    .path {
+      margin-left: 8px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 15px;
+      word-break: break-word;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 18px;
+      background: var(--panel);
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef2f7;
+    }
+
+    code {
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.95em;
+    }
+
+    pre {
+      overflow: auto;
+      margin: 12px 0 18px;
+      padding: 14px;
+      border-radius: 6px;
+      color: var(--code-text);
+      background: var(--code-bg);
+    }
+
+    a {
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <h1>VIM API Docs</h1>
+      <p class="summary">Documentazione iniziale delle API sviluppate nel plugin <code>Quivi.Profile</code>. Base URL locale: <code>http://localhost:8085</code>.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="grid" aria-label="Informazioni principali">
+      <div class="panel">
+        <h2>Ambiente</h2>
+        <p><strong>Base URL:</strong> <code>http://localhost:8085</code></p>
+        <p><strong>Formato:</strong> JSON</p>
+        <p><strong>Header consigliati:</strong> <code>Accept: application/json</code>, <code>Content-Type: application/json</code></p>
+      </div>
+      <div class="panel">
+        <h2>Credenziali test</h2>
+        <p><strong>Username:</strong> <code>demo</code></p>
+        <p><strong>Password:</strong> <code>demo.123</code></p>
+      </div>
+      <div class="panel">
+        <h2>Postman</h2>
+        <p>Collection: <a href="./vim-api.postman_collection.json"><code>vim-api.postman_collection.json</code></a></p>
+        <p>La richiesta di login salva automaticamente la variabile collection <code>access_token</code>.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Autenticazione</h2>
+      <p>Gli endpoint protetti richiedono un bearer token JWT nell'header <code>Authorization</code>.</p>
+      <pre><code>Authorization: Bearer {{access_token}}</code></pre>
+      <p>Il token viene emesso con algoritmo <code>HS256</code>. La durata predefinita e <code>3600</code> secondi, configurabile tramite <code>JWT_TTL</code> in minuti.</p>
+    </section>
+
+    <section class="endpoint">
+      <h2><span class="method">POST</span><span class="path">/api/v1/users/login</span></h2>
+      <p>Autentica un utente registrato e restituisce un token JWT.</p>
+
+      <h3>Body JSON</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Campo</th>
+            <th>Tipo</th>
+            <th>Obbligatorio</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>login</code></td>
+            <td>string</td>
+            <td>Si, se manca <code>email</code></td>
+            <td>Username dell'utente.</td>
+          </tr>
+          <tr>
+            <td><code>email</code></td>
+            <td>string</td>
+            <td>Si, se manca <code>login</code></td>
+            <td>Email valida dell'utente.</td>
+          </tr>
+          <tr>
+            <td><code>password</code></td>
+            <td>string</td>
+            <td>Si</td>
+            <td>Password dell'utente.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Esempio richiesta</h3>
+      <pre><code>curl -X POST http://localhost:8085/api/v1/users/login \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"login":"demo","password":"demo.123"}'</code></pre>
+
+      <h3>Risposta 200</h3>
+      <pre><code>{
+  "access_token": "&lt;jwt&gt;",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "user": {
+    "id": 2,
+    "name": "Demo",
+    "email": "demo@vim.it",
+    "username": "demo",
+    "surname": "Demo",
+    "is_activated": true,
+    "groups": [],
+    "birth_date": null
+  }
+}</code></pre>
+
+      <h3>Errori</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Quando</th>
+            <th>Body</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>401</code></td>
+            <td>Credenziali non valide.</td>
+            <td><code>{"error":"Invalid credentials."}</code></td>
+          </tr>
+          <tr>
+            <td><code>403</code></td>
+            <td>Utente bannato.</td>
+            <td><code>{"error":"User is banned."}</code></td>
+          </tr>
+          <tr>
+            <td><code>422</code></td>
+            <td>Body mancante o non valido.</td>
+            <td><code>{"errors":{...}}</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Endpoint protetti gia presenti</h2>
+      <div class="endpoint">
+        <h3><span class="method">GET</span><span class="path">/api/v1/users/logged</span></h3>
+        <p>Restituisce il profilo dell'utente autenticato.</p>
+      </div>
+      <div class="endpoint">
+        <h3><span class="method">PATCH</span><span class="path">/api/v1/users/profile</span></h3>
+        <p>Aggiorna i campi profilo supportati: <code>name</code>, <code>surname</code>, <code>username</code>, <code>email</code>, <code>birth_date</code>.</p>
+      </div>
+      <div class="endpoint">
+        <h3><span class="method">POST</span><span class="path">/api/v1/users/refresh</span></h3>
+        <p>Emette un nuovo token per l'utente autenticato.</p>
+      </div>
+      <div class="endpoint">
+        <h3><span class="method">POST</span><span class="path">/api/v1/users/logout</span></h3>
+        <p>Risponde con <code>{"success":true}</code>. Il token JWT resta stateless lato server.</p>
+      </div>
+    </section>
+
+    <section class="notice">
+      <h2>Verifica del 27/05/2026</h2>
+      <p>La login locale con <code>demo</code> / <code>demo.123</code> ha risposto <code>200 OK</code>, con token bearer e profilo utente. Anche <code>GET /api/v1/users/logged</code> con il token emesso ha risposto <code>200 OK</code>.</p>
+    </section>
+  </main>
+</body>
+</html>

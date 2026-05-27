@@ -62,6 +62,27 @@ services:
     depends_on:
       dbvim:
         condition: service_healthy
+
+  app:
+    image: node:20-bookworm-slim
+    container_name: vim-app
+    restart: unless-stopped
+    working_dir: /app
+    command: >
+      sh -c "set -e;
+      test -f .env || cp .env.example .env;
+      npm install --no-package-lock;
+      npm run check;
+      bash scripts/build-app.sh;
+      npm run serve"
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./app:/app
+      - app_node_modules:/app/node_modules
+    environment:
+      - TZ=${TZ}
+
   composer:
     build: ./platform
     entrypoint: ["composer"]
@@ -71,3 +92,4 @@ services:
       
 volumes:
   mysql_data:
+  app_node_modules:

@@ -1,0 +1,6 @@
+plugin:
+    name: 'quivi.profile::lang.plugin.name'
+    description: 'quivi.profile::lang.plugin.description'
+    author: Quivi
+    icon: oc-icon-users
+    homepage: ''
