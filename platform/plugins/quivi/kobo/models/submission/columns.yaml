@@ -1,0 +1,27 @@
+columns:
+    id:
+        label: id
+        type: number
+    user:
+        label: user
+        type: text
+        select: username
+        relation: user
+    asset_uid:
+        label: asset_uid
+        type: text
+    kobo_id:
+        label: kobo_id
+        type: number
+    kobo_uuid:
+        label: kobo_uuid
+        type: text
+    status:
+        label: status
+        type: text
+    error:
+        label: error
+        type: text
+    updated_at:
+        label: updated_at
+        type: datetime

@@ -1,0 +1,11 @@
+name: Submissions
+modelClass: Quivi\Kobo\Models\Submission
+form: $/quivi/kobo/models/submission/fields.yaml
+defaultRedirect: quivi/kobo/submissions
+create:
+    redirect: 'quivi/kobo/submissions/update/:id'
+    redirectClose: quivi/kobo/submissions
+update:
+    redirect: quivi/kobo/submissions
+    redirectClose: quivi/kobo/submissions
+preview: {  }

@@ -80,6 +80,49 @@ class Api
         );
     }
 
+    public function findSubmissionByUuid(string $assetUid, string $uuid): ?array
+    {
+        $uuid = preg_replace('/^uuid:/i', '', trim($uuid));
+        if ($uuid === '') {
+            return null;
+        }
+
+        $queries = [
+            ['_uuid' => $uuid],
+            ['_uuid' => 'uuid:' . $uuid],
+            ['meta/instanceID' => 'uuid:' . $uuid],
+        ];
+
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            foreach ($queries as $query) {
+                try {
+                    $page = $this->submissions($assetUid, [
+                        'query' => json_encode($query),
+                        'limit' => 1,
+                    ]);
+                } catch (\Throwable $ex) {
+                    continue;
+                }
+
+                $results = $page['results'] ?? [];
+                if (!is_array($results) || !$results) {
+                    continue;
+                }
+
+                $record = reset($results);
+                if (is_array($record)) {
+                    return $record;
+                }
+            }
+
+            if ($attempt < 2) {
+                usleep(500000);
+            }
+        }
+
+        return null;
+    }
+
     public function allSubmissions(string $assetUid, array $query = []): array
     {
         $url = $this->buildUrl('assets/' . rawurlencode($assetUid) . '/data/', $query);

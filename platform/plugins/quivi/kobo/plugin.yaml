@@ -4,3 +4,13 @@ plugin:
     author: Quivi
     icon: oc-icon-columns
     homepage: ''
+navigation:
+    main-menu-item:
+        label: VIM
+        url: quivi/kobo/submissions
+        icon: icon-suitcase
+        sideMenu:
+            side-menu-item:
+                label: Submissions
+                url: quivi/kobo/submissions
+                icon: icon-send
