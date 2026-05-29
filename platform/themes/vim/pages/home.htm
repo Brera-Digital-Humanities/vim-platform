@@ -1,7 +1,185 @@
-title = "Home"
+title = "VIM App"
 url = "/"
 layout = "default"
 ==
-<div class="content">
-    <h1>Home Page</h1>
-</div>
+{% put page_title %}VIM App - Instructions{% endput %}
+
+<main class="guide-page">
+    <nav class="language-switch" aria-label="Language selector">
+        <button class="language-btn active" type="button" data-lang-option="en" aria-pressed="true">
+            <span class="flag flag-en" aria-hidden="true"></span>
+            <span>English</span>
+        </button>
+        <button class="language-btn" type="button" data-lang-option="it" aria-pressed="false">
+            <span class="flag flag-it" aria-hidden="true"></span>
+            <span>Italiano</span>
+        </button>
+        <button class="language-btn" type="button" data-lang-option="ar" aria-pressed="false">
+            <span class="flag flag-ar" aria-hidden="true"></span>
+            <span>العربية</span>
+        </button>
+    </nav>
+
+    <section class="guide-hero">
+        <div class="guide-hero-copy">
+            <div class="guide-kicker" data-i18n="hero.kicker">The immaterial suitcase</div>
+            <h1 data-i18n="hero.title">Use the VIM app to collect and submit field forms.</h1>
+            <p data-i18n="hero.copy">
+                Open the app from your phone, install it on the Home screen and fill in forms even when the connection is unstable.
+                Submissions are queued and synced as soon as possible.
+            </p>
+            <div class="guide-actions">
+                <a class="guide-btn primary" href="https://app.vim.quivi.it" target="_blank" rel="noopener" data-i18n="hero.openApp">Open app.vim.quivi.it</a>
+                <a class="guide-btn secondary" href="#installazione" data-i18n="hero.installLink">How to install it</a>
+            </div>
+        </div>
+
+        <div class="access-panel" aria-label="Quick access to the VIM app" data-i18n-aria-label="access.ariaLabel">
+            <div class="access-icon">
+                <img src="{{ 'assets/images/vim-icon-192.png'|theme }}" alt="" aria-hidden="true">
+            </div>
+            <div>
+                <div class="access-title" data-i18n="access.title">Quick access</div>
+                <a class="access-link" href="https://app.vim.quivi.it" target="_blank" rel="noopener">app.vim.quivi.it</a>
+            </div>
+            <div class="qr-wrap">
+                <img src="{{ 'assets/images/app-qr.svg'|theme }}" alt="QR code to open app.vim.quivi.it" data-i18n-alt="access.qrAlt">
+            </div>
+            <p class="qr-note" data-i18n="access.qrNote">On mobile, tap the link. From a computer, scan this QR code with your phone camera.</p>
+        </div>
+    </section>
+
+    <section class="guide-section" id="installazione">
+        <div class="section-heading">
+            <span>01</span>
+            <h2 data-i18n="install.title">Install the PWA on your Home screen</h2>
+        </div>
+        <div class="steps-grid">
+            <article class="step-card">
+                <div class="step-os">iPhone / iPad</div>
+                <ol>
+                    <li data-i18n="install.ios.1">Open <strong>app.vim.quivi.it</strong> with Safari.</li>
+                    <li data-i18n="install.ios.2">Tap the share button.</li>
+                    <li data-i18n="install.ios.3">Choose <strong>Add to Home Screen</strong>.</li>
+                    <li data-i18n="install.ios.4">Confirm with <strong>Add</strong>.</li>
+                </ol>
+            </article>
+            <article class="step-card">
+                <div class="step-os">Android</div>
+                <ol>
+                    <li data-i18n="install.android.1">Open <strong>app.vim.quivi.it</strong> with Chrome.</li>
+                    <li data-i18n="install.android.2">When it appears, tap <strong>Install app</strong>.</li>
+                    <li data-i18n="install.android.3">If it does not appear, open the browser menu.</li>
+                    <li data-i18n="install.android.4">Choose <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>
+                </ol>
+            </article>
+        </div>
+    </section>
+
+    <section class="guide-section">
+        <div class="section-heading">
+            <span>02</span>
+            <h2 data-i18n="workflow.title">Fill in and submit a form</h2>
+        </div>
+        <div class="workflow">
+            <article class="workflow-item">
+                <strong data-i18n="workflow.login.title">Sign in</strong>
+                <p data-i18n="workflow.login.copy">Enter the username and password provided by the VIM project.</p>
+            </article>
+            <article class="workflow-item">
+                <strong data-i18n="workflow.fill.title">Fill in</strong>
+                <p data-i18n="workflow.fill.copy">Open <em>Fill in form</em>, choose the language and complete the required fields.</p>
+            </article>
+            <article class="workflow-item">
+                <strong data-i18n="workflow.media.title">Attach media</strong>
+                <p data-i18n="workflow.media.copy">Record audio or video, take photos or upload files already on the device.</p>
+            </article>
+            <article class="workflow-item">
+                <strong data-i18n="workflow.submit.title">Submit</strong>
+                <p data-i18n="workflow.submit.copy">Tap <em>Completed</em> and choose automatic or manual sending. If you are offline, the form stays in the queue.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="guide-section">
+        <div class="section-heading">
+            <span>03</span>
+            <h2 data-i18n="screens.title">Reference screens</h2>
+        </div>
+        <div class="shots-grid">
+            <article class="phone-shot">
+                <div class="shot-top"></div>
+                <div class="shot-brand">
+                    <img src="{{ 'assets/images/vim-icon-192.png'|theme }}" alt="">
+                    <strong data-i18n="brand.name">The immaterial suitcase</strong>
+                    <span data-i18n="screen.login.badge">Sign in</span>
+                </div>
+                <div class="shot-input" data-i18n="screen.login.username">Username</div>
+                <div class="shot-input" data-i18n="screen.login.password">Password</div>
+                <div class="shot-button" data-i18n="screen.login.button">Sign in</div>
+                <p data-i18n="screen.login.copy">Sign in with the credentials assigned to you.</p>
+            </article>
+
+            <article class="phone-shot">
+                <div class="shot-top"></div>
+                <div class="shot-brand compact">
+                    <img src="{{ 'assets/images/vim-icon-192.png'|theme }}" alt="">
+                    <strong data-i18n="brand.name">The immaterial suitcase</strong>
+                    <span>v1.0</span>
+                </div>
+                <div class="shot-menu dark">
+                    <span data-i18n="screen.home.fill">Fill in form</span>
+                    <small data-i18n="screen.home.fillHelp">Start the questionnaire</small>
+                </div>
+                <div class="shot-menu">
+                    <span data-i18n="screen.home.outbox">Forms to send</span>
+                    <small data-i18n="screen.home.outboxHelp">Waiting to be sent</small>
+                </div>
+                <div class="shot-menu">
+                    <span data-i18n="screen.home.sent">Submitted forms</span>
+                    <small data-i18n="screen.home.sentHelp">Sent answers</small>
+                </div>
+                <p data-i18n="screen.home.copy">The Home screen contains the main actions and archive.</p>
+            </article>
+
+            <article class="phone-shot">
+                <div class="shot-top"></div>
+                <div class="shot-question">
+                    <small data-i18n="screen.form.section">Section 4 / 9</small>
+                    <strong data-i18n="screen.form.audio">Record audio</strong>
+                    <div class="shot-media-row">
+                        <span data-i18n="screen.form.record">Record</span>
+                        <span data-i18n="screen.form.uploadAudio">Upload audio</span>
+                    </div>
+                    <div class="shot-audio-bar"></div>
+                </div>
+                <div class="shot-nav">
+                    <span data-i18n="screen.form.saveDraft">Save draft</span>
+                    <span data-i18n="screen.form.completed">Completed</span>
+                </div>
+                <p data-i18n="screen.form.copy">You can save a draft and continue later.</p>
+            </article>
+
+            <article class="phone-shot">
+                <div class="shot-top"></div>
+                <div class="shot-list-title" data-i18n="screen.outbox.title">Forms to send</div>
+                <div class="shot-outbox">
+                    <strong data-i18n="screen.outbox.formTitle">Collection form</strong>
+                    <span data-i18n="screen.outbox.saved">Saved in the queue</span>
+                    <div class="shot-status" data-i18n="screen.outbox.auto">Automatic sending: on</div>
+                </div>
+                <div class="shot-button light" data-i18n="screen.outbox.sendAll">Send all</div>
+                <p data-i18n="screen.outbox.copy">Failed submissions remain available so you can try again.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="guide-note">
+        <h2 data-i18n="field.title">Before going into the field</h2>
+        <ul>
+            <li data-i18n="field.1">Open the app at least once with an active connection.</li>
+            <li data-i18n="field.2">Check that sign-in, microphone, camera and free storage work.</li>
+            <li data-i18n="field.3">Send whenever you can: data remains on the device, but it depends on browser limits.</li>
+        </ul>
+    </section>
+</main>
