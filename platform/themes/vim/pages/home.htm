@@ -107,69 +107,34 @@ layout = "default"
             <h2 data-i18n="screens.title">Reference screens</h2>
         </div>
         <div class="shots-grid">
-            <article class="phone-shot">
-                <div class="shot-top"></div>
-                <div class="shot-brand">
-                    <img src="{{ 'assets/images/vim-icon-192.png'|theme }}" alt="">
-                    <strong data-i18n="brand.name">The immaterial suitcase</strong>
-                    <span data-i18n="screen.login.badge">Sign in</span>
-                </div>
-                <div class="shot-input" data-i18n="screen.login.username">Username</div>
-                <div class="shot-input" data-i18n="screen.login.password">Password</div>
-                <div class="shot-button" data-i18n="screen.login.button">Sign in</div>
+            <article class="phone-shot image-shot">
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_login.png'|theme }}" alt="VIM app sign-in screen" data-i18n-alt="screen.login.alt">
                 <p data-i18n="screen.login.copy">Sign in with the credentials assigned to you.</p>
             </article>
 
-            <article class="phone-shot">
-                <div class="shot-top"></div>
-                <div class="shot-brand compact">
-                    <img src="{{ 'assets/images/vim-icon-192.png'|theme }}" alt="">
-                    <strong data-i18n="brand.name">The immaterial suitcase</strong>
-                    <span>v1.0</span>
-                </div>
-                <div class="shot-menu dark">
-                    <span data-i18n="screen.home.fill">Fill in form</span>
-                    <small data-i18n="screen.home.fillHelp">Start the questionnaire</small>
-                </div>
-                <div class="shot-menu">
-                    <span data-i18n="screen.home.outbox">Forms to send</span>
-                    <small data-i18n="screen.home.outboxHelp">Waiting to be sent</small>
-                </div>
-                <div class="shot-menu">
-                    <span data-i18n="screen.home.sent">Submitted forms</span>
-                    <small data-i18n="screen.home.sentHelp">Sent answers</small>
-                </div>
+            <article class="phone-shot image-shot">
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_home.png'|theme }}" alt="VIM app home screen" data-i18n-alt="screen.home.alt">
                 <p data-i18n="screen.home.copy">The Home screen contains the main actions and archive.</p>
             </article>
 
-            <article class="phone-shot">
-                <div class="shot-top"></div>
-                <div class="shot-question">
-                    <small data-i18n="screen.form.section">Section 4 / 9</small>
-                    <strong data-i18n="screen.form.audio">Record audio</strong>
-                    <div class="shot-media-row">
-                        <span data-i18n="screen.form.record">Record</span>
-                        <span data-i18n="screen.form.uploadAudio">Upload audio</span>
-                    </div>
-                    <div class="shot-audio-bar"></div>
-                </div>
-                <div class="shot-nav">
-                    <span data-i18n="screen.form.saveDraft">Save draft</span>
-                    <span data-i18n="screen.form.completed">Completed</span>
-                </div>
+            <article class="phone-shot image-shot">
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_form.png'|theme }}" alt="VIM app form screen" data-i18n-alt="screen.form.alt">
                 <p data-i18n="screen.form.copy">You can save a draft and continue later.</p>
             </article>
 
-            <article class="phone-shot">
-                <div class="shot-top"></div>
-                <div class="shot-list-title" data-i18n="screen.outbox.title">Forms to send</div>
-                <div class="shot-outbox">
-                    <strong data-i18n="screen.outbox.formTitle">Collection form</strong>
-                    <span data-i18n="screen.outbox.saved">Saved in the queue</span>
-                    <div class="shot-status" data-i18n="screen.outbox.auto">Automatic sending: on</div>
-                </div>
-                <div class="shot-button light" data-i18n="screen.outbox.sendAll">Send all</div>
-                <p data-i18n="screen.outbox.copy">Failed submissions remain available so you can try again.</p>
+            <article class="phone-shot image-shot">
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_record.png'|theme }}" alt="VIM app media recording screen" data-i18n-alt="screen.record.alt">
+                <p data-i18n="screen.record.copy">Record audio or video directly from the browser when the form asks for it.</p>
+            </article>
+
+            <article class="phone-shot image-shot">
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_complete.png'|theme }}" alt="VIM app completed form screen" data-i18n-alt="screen.complete.alt">
+                <p data-i18n="screen.complete.copy">Complete the form when all required information has been entered.</p>
+            </article>
+
+            <article class="phone-shot image-shot">
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_send.png'|theme }}" alt="VIM app submission queue screen" data-i18n-alt="screen.send.alt">
+                <p data-i18n="screen.send.copy">Send pending forms or keep them in the queue until the connection is available.</p>
             </article>
         </div>
     </section>
