@@ -1,0 +1,50 @@
+<?php return [
+    'plugin' => [
+        'name' => 'Kobo',
+        'description' => ''
+    ],
+    'review' => [
+        'not_available' => 'الإرسال المحلي غير متاح.',
+        'title' => 'معاينة بيانات Kobo',
+        'load_error' => 'تعذر استرجاع البيانات المنشورة على Kobo.',
+        'local_submission' => 'الإرسال المحلي',
+        'answers' => 'الإجابات',
+        'no_answers' => 'لم يتم العثور على إجابات تطبيقية في هذا الإرسال.',
+        'unmapped_key' => 'مفتاح غير مطابق',
+        'attachments' => 'المرفقات',
+        'no_attachments' => 'لا توجد مرفقات Kobo متاحة.',
+        'open_attachment' => 'فتح المرفق',
+        'metadata' => 'بيانات Kobo الوصفية',
+        'no_metadata' => 'لا توجد بيانات Kobo وصفية متاحة.',
+        'values' => [
+            'boolean_yes' => 'نعم',
+            'boolean_no' => 'لا',
+        ],
+        'errors' => [
+            'asset_uid_missing' => 'معرف الأصل Asset UID غير موجود: لا يمكن استرجاع الإرسال من Kobo.',
+            'kobo_identifiers_missing' => 'معرف Kobo أو UUID غير موجود: يبدو أن الإرسال لم ينشر على Kobo بعد.',
+            'download_asset_uid_missing' => 'معرف الأصل Asset UID غير موجود.',
+            'attachment_not_found' => 'لم يتم العثور على مرفق Kobo.',
+            'attachment_download_url_missing' => 'رابط تنزيل مرفق Kobo غير متاح.',
+            'submission_not_found_by_uuid' => 'لم يتم العثور على إرسال Kobo باستخدام UUID :uuid.',
+            'submission_not_found' => 'لم يتم العثور على الإرسال.',
+            'authenticated_user_not_found' => 'لم يتم العثور على المستخدم المصادق عليه.',
+        ],
+    ],
+    'api' => [
+        'errors' => [
+            'missing_paginated_results' => 'استجابة Kobo غير متوقعة: نتائج الصفحات مفقودة.',
+            'media_request_failed' => 'فشل طلب وسائط Kobo مع HTTP :status: :body',
+            'token_missing' => 'لم يتم ضبط KOBO_API_TOKEN.',
+            'xml_submission_required' => 'حقل xml_submission_file مطلوب.',
+            'xml_submission_prepare_failed' => 'تعذر تجهيز ملف XML الخاص بالإرسال.',
+            'submission_request_init_failed' => 'تعذر تهيئة طلب إرسال Kobo.',
+            'submission_curl_failed' => 'فشل cURL الخاص بإرسال Kobo: :error',
+            'submission_error' => 'خطأ في إرسال Kobo: :error',
+            'submission_failed' => 'فشل إرسال Kobo.',
+            'invalid_json' => 'أرجع Kobo بيانات JSON غير صالحة: :error',
+            'payload_encode_failed' => 'تعذر ترميز حمولة طلب Kobo: :error',
+            'request_failed' => 'فشل طلب API من Kobo مع HTTP :status: :body',
+        ],
+    ],
+];

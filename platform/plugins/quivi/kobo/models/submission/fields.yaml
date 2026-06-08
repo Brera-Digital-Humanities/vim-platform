@@ -1,39 +1,52 @@
-fields:
-    user:
-        label: User
-        span: auto
-        type: relation
-        nameFrom: username
-        readOnly: 1
-    asset_uid:
-        label: 'Asset UID'
-        span: auto
-        type: text
-        readOnly: 1
-    kobo_id:
-        label: 'ID Kobo'
-        span: auto
-        type: number
-        readOnly: 1
-    kobo_uuid:
-        label: 'UUID Kobo'
-        span: auto
-        type: text
-        readOnly: 1
-    status:
-        label: Status
-        span: auto
-        type: text
-        readOnly: 1
-    updated_at:
-        label: 'Ultimo aggiornamento'
-        span: auto
-        disabled: 0
-        readOnly: 1
-        type: text
-    error:
-        label: Error
-        size: small
-        span: full
-        type: textarea
-        readOnly: 1
+tabs:
+    fields:
+        user:
+            label: User
+            span: auto
+            type: relation
+            nameFrom: username
+            readOnly: 1
+            tab: Submission
+        asset_uid:
+            label: 'Asset UID'
+            span: auto
+            type: text
+            readOnly: 1
+            tab: Submission
+        kobo_uuid:
+            label: 'UUID Kobo'
+            span: auto
+            type: text
+            readOnly: 1
+            tab: Submission
+        kobo_id:
+            label: 'ID Kobo'
+            span: auto
+            type: number
+            readOnly: 1
+            tab: Submission
+        updated_at:
+            label: 'Updated at'
+            span: auto
+            disabled: 0
+            readOnly: 1
+            type: text
+            tab: Submission
+        status:
+            label: Status
+            span: auto
+            type: text
+            readOnly: 1
+            tab: Submission
+        error:
+            label: Error
+            size: small
+            span: full
+            readOnly: 1
+            type: textarea
+            tab: Submission
+        _review:
+            span: full
+            path: $/quivi/kobo/views/review.htm
+            type: partial
+            tab: Data

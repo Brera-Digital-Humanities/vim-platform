@@ -1,0 +1,17 @@
+1.0.1:
+    - 'Initialize plugin.'
+1.0.2:
+    - 'Created table quivi_archive_items'
+    - builder_table_create_quivi_archive_items.php
+1.0.3:
+    - 'Updated table quivi_archive_items'
+    - builder_table_update_quivi_archive_items.php
+1.0.4:
+    - 'Created table quivi_archive_meta_keys'
+    - builder_table_create_quivi_archive_meta_keys.php
+1.0.5:
+    - 'Created table quivi_archive_meta_values'
+    - builder_table_create_quivi_archive_meta_values.php
+1.0.6:
+    - 'Updated table quivi_archive_items'
+    - builder_table_update_quivi_archive_items_2.php

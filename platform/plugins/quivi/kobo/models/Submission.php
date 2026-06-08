@@ -35,6 +35,7 @@ class Submission extends Model
      */
     public $belongsTo = [
         'user' => [\Winter\User\Models\User::class],
+        'validator' => [\Backend\Models\User::class, 'key' => 'validator_id']
     ];
 
     /**

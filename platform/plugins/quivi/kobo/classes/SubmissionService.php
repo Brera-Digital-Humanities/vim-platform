@@ -14,7 +14,7 @@ class SubmissionService
     {
         $user = $request->attributes->get('api_user');
         if (!$user instanceof User) {
-            throw new ApplicationException('Authenticated user not found.');
+            throw new ApplicationException(trans('quivi.kobo::lang.review.errors.authenticated_user_not_found'));
         }
 
         $xml = $this->submissionXml($request);
@@ -77,7 +77,7 @@ class SubmissionService
                 ->first();
 
             if (!$submission) {
-                throw new ApplicationException('Submission not found.');
+                throw new ApplicationException(trans('quivi.kobo::lang.review.errors.submission_not_found'));
             }
 
             return $submission;

@@ -1,0 +1,6 @@
+plugin:
+    name: 'quivi.vim::lang.plugin.name'
+    description: 'quivi.vim::lang.plugin.description'
+    author: Quivi
+    icon: oc-icon-suitcase
+    homepage: ''

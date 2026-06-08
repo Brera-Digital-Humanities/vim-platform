@@ -1,0 +1,6 @@
+plugin:
+    name: 'quivi.archive::lang.plugin.name'
+    description: 'quivi.archive::lang.plugin.description'
+    author: Quivi
+    icon: oc-icon-bank
+    homepage: ''

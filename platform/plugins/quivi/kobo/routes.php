@@ -12,7 +12,7 @@ Route::group(['prefix' => 'api/v1/kobo'], function () {
     Route::group(['middleware' => [JwtMiddleware::class]], function () {
         Route::post('submissions', function (Request $request) {
             if (!$request->hasFile('xml_submission_file') && !$request->input('xml_submission_file')) {
-                return Response::json(['error' => 'xml_submission_file is required.'], 422);
+                return Response::json(['error' => trans('quivi.kobo::lang.api.errors.xml_submission_required')], 422);
             }
 
             $submission = null;
@@ -52,7 +52,9 @@ Route::group(['prefix' => 'api/v1/kobo'], function () {
                     'error' => $ex->getMessage(),
                 ], 500);
             } catch (\Throwable $ex) {
-                $error = 'Kobo submission error: ' . $ex->getMessage();
+                $error = trans('quivi.kobo::lang.api.errors.submission_error', [
+                    'error' => $ex->getMessage(),
+                ]);
                 if ($submission) {
                     $tracker->markError($submission, $error);
                 }
@@ -75,13 +77,13 @@ Route::group(['prefix' => 'api/v1/kobo'], function () {
             ];
 
             if (!$result['ok']) {
-                $error = 'Kobo submission failed.';
+                $error = trans('quivi.kobo::lang.api.errors.submission_failed');
                 if (!empty($result['body'])) {
                     $error .= ' ' . $result['body'];
                 }
 
                 $tracker->markError($submission, $error);
-                $payload['error'] = 'Kobo submission failed.';
+                $payload['error'] = trans('quivi.kobo::lang.api.errors.submission_failed');
                 $payload['kobo_response'] = $result['body'];
 
                 return Response::json($payload, $result['status'] ?: 502);

@@ -1,0 +1,236 @@
+<?php
+use Quivi\Kobo\Classes\SubmissionPreview;
+
+$submission = $formModel ?? $model ?? null;
+$preview = $submission ? SubmissionPreview::make()->build($submission) : null;
+$statusClass = 'label-default';
+$locale = strtolower(str_replace('_', '-', (string) App::getLocale()));
+$tr = static fn (string $key): string => trans('quivi.kobo::lang.review.' . $key);
+$direction = str_starts_with($locale, 'ar') ? 'rtl' : 'ltr';
+
+if ($submission) {
+    if ($submission->status === 'done') {
+        $statusClass = 'label-success';
+    } elseif ($submission->status === 'error') {
+        $statusClass = 'label-danger';
+    } elseif ($submission->status === 'created') {
+        $statusClass = 'label-warning';
+    }
+}
+?>
+
+<style>
+    .kobo-review {
+        border: 1px solid #d7d7d7;
+        border-radius: 4px;
+        background: #fff;
+        margin-top: 8px;
+        overflow: hidden;
+    }
+
+    .kobo-review__header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 18px;
+        border-bottom: 1px solid #e5e5e5;
+        background: #f7f7f7;
+    }
+
+    .kobo-review__header h4 {
+        margin: 0 0 6px;
+        font-size: 16px;
+    }
+
+    .kobo-review__header p {
+        margin: 0;
+        color: #666;
+    }
+
+    .kobo-review__status {
+        min-width: 112px;
+        align-self: flex-start;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .kobo-review__section {
+        padding: 18px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .kobo-review__section:first-child {
+        border-top: 0;
+    }
+
+    .kobo-review__section h5 {
+        margin: 0 0 12px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #555;
+    }
+
+    .kobo-review__table {
+        margin-bottom: 0;
+    }
+
+    .kobo-review__table th {
+        width: 32%;
+        color: #555;
+        font-weight: 600;
+    }
+
+    .kobo-review__table td {
+        word-break: break-word;
+    }
+
+    .kobo-review__attachments {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 14px;
+    }
+
+    .kobo-review__attachment {
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 12px;
+        background: #fafafa;
+    }
+
+    .kobo-review__attachment-title {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        word-break: break-word;
+    }
+
+    .kobo-review__attachment img,
+    .kobo-review__attachment video {
+        display: block;
+        width: 100%;
+        max-height: 360px;
+        object-fit: contain;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 3px;
+    }
+
+    .kobo-review__attachment audio {
+        width: 100%;
+    }
+
+    .kobo-review__attachment-footer {
+        margin-top: 10px;
+        color: #777;
+        font-size: 12px;
+    }
+</style>
+
+<?php if (!$submission): ?>
+    <p class="flash-message static warning"><?= e($tr('not_available')) ?></p>
+<?php elseif (!$preview['ok']): ?>
+    <div class="kobo-review" dir="<?= e($direction) ?>">
+        <div class="kobo-review__header">
+            <div>
+                <h4><?= e($tr('title')) ?></h4>
+                <p><?= e($tr('load_error')) ?></p>
+            </div>
+            <span class="label <?= e($statusClass) ?> kobo-review__status"><?= e($submission->status) ?></span>
+        </div>
+        <div class="kobo-review__section">
+            <p class="flash-message static warning"><?= e($preview['error']) ?></p>
+        </div>
+    </div>
+<?php else: ?>
+    <div class="kobo-review" dir="<?= e($direction) ?>">
+        <div class="kobo-review__header">
+            <div>
+                <h4><?= e($tr('title')) ?></h4>
+                <p>
+                    <?= e($tr('local_submission')) ?> #<?= e($submission->id) ?>
+                    <?php if ($submission->kobo_id): ?>
+                        &middot; Kobo ID <?= e($submission->kobo_id) ?>
+                    <?php endif ?>
+                    <?php if ($submission->kobo_uuid): ?>
+                        &middot; UUID <?= e($submission->kobo_uuid) ?>
+                    <?php endif ?>
+                </p>
+            </div>
+            <span class="label <?= e($statusClass) ?> kobo-review__status"><?= e($submission->status) ?></span>
+        </div>
+
+        <div class="kobo-review__section">
+            <h5><?= e($tr('answers')) ?></h5>
+            <?php if (!$preview['answers']): ?>
+                <p class="text-muted"><?= e($tr('no_answers')) ?></p>
+            <?php else: ?>
+                <table class="table table-striped kobo-review__table">
+                    <tbody>
+                        <?php foreach ($preview['answers'] as $answer): ?>
+                            <tr>
+                                <th>
+                                    <?= e($answer['label']) ?>
+                                    <?php if ($answer['label'] === $answer['key']): ?>
+                                        <br>
+                                        <small class="text-muted"><?= e($tr('unmapped_key')) ?></small>
+                                    <?php endif ?>
+                                </th>
+                                <td><?= nl2br(e($answer['value'])) ?></td>
+                            </tr>
+                        <?php endforeach ?>
+                    </tbody>
+                </table>
+            <?php endif ?>
+        </div>
+
+        <div class="kobo-review__section">
+            <h5><?= e($tr('attachments')) ?></h5>
+            <?php if (!$preview['attachments']): ?>
+                <p class="text-muted"><?= e($tr('no_attachments')) ?></p>
+            <?php else: ?>
+                <div class="kobo-review__attachments">
+                    <?php foreach ($preview['attachments'] as $attachment): ?>
+                        <div class="kobo-review__attachment">
+                            <strong class="kobo-review__attachment-title"><?= e($attachment['label']) ?></strong>
+
+                            <?php if ($attachment['kind'] === 'image'): ?>
+                                <img src="<?= e($attachment['url']) ?>" alt="<?= e($attachment['label']) ?>">
+                            <?php elseif ($attachment['kind'] === 'audio'): ?>
+                                <audio controls preload="metadata" src="<?= e($attachment['url']) ?>"></audio>
+                            <?php elseif ($attachment['kind'] === 'video'): ?>
+                                <video controls preload="metadata" src="<?= e($attachment['url']) ?>"></video>
+                            <?php else: ?>
+                                <a class="btn btn-default oc-icon-download" href="<?= e($attachment['url']) ?>" target="_blank" rel="noopener">
+                                    <?= e($tr('open_attachment')) ?>
+                                </a>
+                            <?php endif ?>
+
+                            <div class="kobo-review__attachment-footer">
+                                <?= e($attachment['filename']) ?> &middot; <?= e($attachment['mime']) ?>
+                            </div>
+                        </div>
+                    <?php endforeach ?>
+                </div>
+            <?php endif ?>
+        </div>
+
+        <div class="kobo-review__section">
+            <h5><?= e($tr('metadata')) ?></h5>
+            <?php if (!$preview['metadata']): ?>
+                <p class="text-muted"><?= e($tr('no_metadata')) ?></p>
+            <?php else: ?>
+                <table class="table table-condensed kobo-review__table">
+                    <tbody>
+                        <?php foreach ($preview['metadata'] as $metadata): ?>
+                            <tr>
+                                <th><?= e($metadata['key']) ?></th>
+                                <td><?= e($metadata['value']) ?></td>
+                            </tr>
+                        <?php endforeach ?>
+                    </tbody>
+                </table>
+            <?php endif ?>
+        </div>
+    </div>
+<?php endif ?>

@@ -133,7 +133,7 @@ class Api
             $results = $page['results'] ?? [];
 
             if (!is_array($results)) {
-                throw new ApplicationException('Unexpected Kobo response: missing paginated results.');
+                throw new ApplicationException(trans('quivi.kobo::lang.api.errors.missing_paginated_results'));
             }
 
             $submissions = array_merge($submissions, $results);
@@ -173,10 +173,37 @@ class Api
         return $this->request('DELETE', $path, $query);
     }
 
+    public function download(string $path, array $query = []): array
+    {
+        $response = Http::make($this->buildDownloadUrl($path, $query), 'GET', function (Http $http) {
+            $http->timeout($this->timeout);
+            $http->header('Accept', '*/*');
+
+            if ($this->token) {
+                $http->header('Authorization', 'Token ' . $this->token);
+            }
+
+            $this->configureSsl($http);
+        })->send();
+
+        if (!$response->ok) {
+            throw new ApplicationException(trans('quivi.kobo::lang.api.errors.media_request_failed', [
+                'status' => $response->code,
+                'body' => $response->body,
+            ]));
+        }
+
+        return [
+            'body' => $response->body,
+            'headers' => $response->headers,
+            'status' => $response->code,
+        ];
+    }
+
     public function submitOpenRosa(Request $request): array
     {
         if (!$this->token) {
-            throw new ApplicationException('KOBO_API_TOKEN is not configured.');
+            throw new ApplicationException(trans('quivi.kobo::lang.api.errors.token_missing'));
         }
 
         $files = [];
@@ -188,12 +215,12 @@ class Api
         } else {
             $xml = trim((string) $request->input('xml_submission_file'));
             if ($xml === '') {
-                throw new ApplicationException('xml_submission_file is required.');
+                throw new ApplicationException(trans('quivi.kobo::lang.api.errors.xml_submission_required'));
             }
 
             $tmp = tempnam(sys_get_temp_dir(), 'kobo_submission_');
             if ($tmp === false || file_put_contents($tmp, $xml) === false) {
-                throw new ApplicationException('Unable to prepare XML submission file.');
+                throw new ApplicationException(trans('quivi.kobo::lang.api.errors.xml_submission_prepare_failed'));
             }
 
             $tempFiles[] = $tmp;
@@ -229,7 +256,7 @@ class Api
         $curl = curl_init($this->submissionUrl());
 
         if ($curl === false) {
-            throw new ApplicationException('Unable to initialize Kobo submission request.');
+            throw new ApplicationException(trans('quivi.kobo::lang.api.errors.submission_request_init_failed'));
         }
 
         curl_setopt_array($curl, [
@@ -255,7 +282,9 @@ class Api
         if ($raw === false) {
             $error = curl_error($curl);
             curl_close($curl);
-            throw new ApplicationException('Kobo submission cURL failed: ' . $error);
+            throw new ApplicationException(trans('quivi.kobo::lang.api.errors.submission_curl_failed', [
+                'error' => $error,
+            ]));
         }
 
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
@@ -284,7 +313,9 @@ class Api
         $decoded = json_decode($body, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ApplicationException('Kobo returned invalid JSON: ' . json_last_error_msg());
+            throw new ApplicationException(trans('quivi.kobo::lang.api.errors.invalid_json', [
+                'error' => json_last_error_msg(),
+            ]));
         }
 
         return $decoded ?: [];
@@ -306,7 +337,9 @@ class Api
                 $encodedPayload = json_encode($payload);
 
                 if ($encodedPayload === false) {
-                    throw new ApplicationException('Unable to encode Kobo request payload: ' . json_last_error_msg());
+                    throw new ApplicationException(trans('quivi.kobo::lang.api.errors.payload_encode_failed', [
+                        'error' => json_last_error_msg(),
+                    ]));
                 }
 
                 $http->header('Content-Type', 'application/json');
@@ -315,11 +348,10 @@ class Api
         })->send();
 
         if (!$response->ok) {
-            throw new ApplicationException(sprintf(
-                'Kobo API request failed with HTTP %d: %s',
-                $response->code,
-                $response->body
-            ));
+            throw new ApplicationException(trans('quivi.kobo::lang.api.errors.request_failed', [
+                'status' => $response->code,
+                'body' => $response->body,
+            ]));
         }
 
         return $response->body;
@@ -336,6 +368,23 @@ class Api
             $url = $this->baseUrl . '/' . ltrim($path, '/');
         } else {
             $url = $this->baseUrl . self::API_PREFIX . '/' . ltrim($path, '/');
+        }
+
+        if ($query) {
+            $url .= (str_contains($url, '?') ? '&' : '?') . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+        }
+
+        return $url;
+    }
+
+    protected function buildDownloadUrl(string $path, array $query = []): string
+    {
+        if (preg_match('#^https?://#i', $path)) {
+            $url = $path;
+        } elseif (str_starts_with($path, '/')) {
+            $url = $this->baseUrl . $path;
+        } else {
+            return $this->buildUrl($path, $query);
         }
 
         if ($query) {

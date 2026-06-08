@@ -1,0 +1,50 @@
+<?php return [
+    'plugin' => [
+        'name' => 'Kobo',
+        'description' => ''
+    ],
+    'review' => [
+        'not_available' => 'Local submission is not available.',
+        'title' => 'Kobo data preview',
+        'load_error' => 'Unable to retrieve the data published on Kobo.',
+        'local_submission' => 'Local submission',
+        'answers' => 'Answers',
+        'no_answers' => 'No application answers found in this submission.',
+        'unmapped_key' => 'Unmapped key',
+        'attachments' => 'Attachments',
+        'no_attachments' => 'No Kobo attachments available.',
+        'open_attachment' => 'Open attachment',
+        'metadata' => 'Kobo metadata',
+        'no_metadata' => 'No Kobo metadata available.',
+        'values' => [
+            'boolean_yes' => 'Yes',
+            'boolean_no' => 'No',
+        ],
+        'errors' => [
+            'asset_uid_missing' => 'Asset UID is missing: cannot retrieve the submission from Kobo.',
+            'kobo_identifiers_missing' => 'Kobo ID/UUID are missing: the submission does not appear to have been published to Kobo yet.',
+            'download_asset_uid_missing' => 'Asset UID is missing.',
+            'attachment_not_found' => 'Kobo attachment was not found.',
+            'attachment_download_url_missing' => 'Kobo attachment download URL is not available.',
+            'submission_not_found_by_uuid' => 'Kobo submission was not found using UUID :uuid.',
+            'submission_not_found' => 'Submission not found.',
+            'authenticated_user_not_found' => 'Authenticated user not found.',
+        ],
+    ],
+    'api' => [
+        'errors' => [
+            'missing_paginated_results' => 'Unexpected Kobo response: missing paginated results.',
+            'media_request_failed' => 'Kobo media request failed with HTTP :status: :body',
+            'token_missing' => 'KOBO_API_TOKEN is not configured.',
+            'xml_submission_required' => 'xml_submission_file is required.',
+            'xml_submission_prepare_failed' => 'Unable to prepare XML submission file.',
+            'submission_request_init_failed' => 'Unable to initialize Kobo submission request.',
+            'submission_curl_failed' => 'Kobo submission cURL failed: :error',
+            'submission_error' => 'Kobo submission error: :error',
+            'submission_failed' => 'Kobo submission failed.',
+            'invalid_json' => 'Kobo returned invalid JSON: :error',
+            'payload_encode_failed' => 'Unable to encode Kobo request payload: :error',
+            'request_failed' => 'Kobo API request failed with HTTP :status: :body',
+        ],
+    ],
+];

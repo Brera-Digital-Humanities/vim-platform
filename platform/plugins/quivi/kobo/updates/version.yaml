@@ -6,3 +6,15 @@
 1.0.3:
     - 'Updated submission tracking fields'
     - update_quivi_kobo_submissions_tracking_fields.php
+1.0.4:
+    - 'Updated table quivi_kobo_submissions'
+    - builder_table_update_quivi_kobo_submissions.php
+1.0.5:
+    - 'Updated table quivi_kobo_submissions'
+    - builder_table_update_quivi_kobo_submissions_2.php
+1.0.6:
+    - 'Updated table quivi_kobo_submissions'
+    - builder_table_update_quivi_kobo_submissions_3.php
+1.0.7:
+    - 'Updated table quivi_kobo_submissions'
+    - builder_table_update_quivi_kobo_submissions_4.php
