@@ -1,0 +1,193 @@
+title = "Le mie submission"
+url = "/user/submissions/:id?"
+layout = "default"
+
+[session]
+security = "user"
+redirect = "login"
+==
+function onStart()
+{
+    $user = Auth::getUser();
+    if (!$user) {
+        return;
+    }
+
+    $this['submissions'] = \Quivi\Kobo\Models\Submission::where('user_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    $this['selectedSubmission'] = null;
+    $this['selectedMissing'] = false;
+    $this['preview'] = null;
+    $this['statusLabels'] = [
+        'created' => 'Creato',
+        'done' => 'Inviato',
+        'error' => 'Errore',
+    ];
+
+    $id = $this->param('id');
+    if (!$id) {
+        return;
+    }
+
+    $selected = \Quivi\Kobo\Models\Submission::where('id', (int) $id)
+        ->where('user_id', $user->id)
+        ->first();
+
+    if (!$selected) {
+        $this['selectedMissing'] = true;
+        return;
+    }
+
+    $this['selectedSubmission'] = $selected;
+    $this['preview'] = \Quivi\Kobo\Classes\SubmissionPreview::make(null, url('/user/submission-media'))->build($selected);
+}
+==
+{% put page_title %}Le mie submission - VIM{% endput %}
+
+<main class="account-page">
+    <header class="account-page__header">
+        <div>
+            <p class="page-kicker">Area riservata</p>
+            <h1>Le tue submission</h1>
+            <p>Consulta i moduli inviati dalla app VIM e apri la preview dei dati pubblicati su Kobo.</p>
+        </div>
+        <a class="account-page__logout" href="#" data-request="onLogout" data-request-data="redirect: '/'">Esci</a>
+    </header>
+
+    {% if submissions|length %}
+        <div class="submissions-layout">
+            <section class="submissions-panel">
+                <div class="submissions-panel__head">
+                    <h2>Submission inviate</h2>
+                    <span>{{ submissions|length }}</span>
+                </div>
+
+                <div class="submissions-list">
+                    {% for submission in submissions %}
+                        <a
+                            class="submission-row {{ selectedSubmission and selectedSubmission.id == submission.id ? 'active' : '' }}"
+                            href="{{ 'user/submissions'|page({ id: submission.id }) }}">
+                            <span class="submission-row__id">#{{ submission.id }}</span>
+                            <span class="submission-row__main">
+                                <strong>{{ statusLabels[submission.status]|default(submission.status) }}</strong>
+                                <small>
+                                    {% if submission.created_at %}
+                                        {{ submission.created_at|date('d/m/Y H:i') }}
+                                    {% else %}
+                                        Data non disponibile
+                                    {% endif %}
+                                </small>
+                            </span>
+                            <span class="submission-status status-{{ submission.status }}">{{ submission.status }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="submission-preview-panel">
+                {% if selectedMissing %}
+                    <div class="empty-state">
+                        <h2>Submission non trovata</h2>
+                        <p>La submission richiesta non esiste oppure non appartiene al tuo account.</p>
+                    </div>
+                {% elseif not selectedSubmission %}
+                    <div class="empty-state">
+                        <h2>Seleziona una submission</h2>
+                        <p>Clicca su un elemento della lista per vedere risposte, allegati e metadati Kobo.</p>
+                    </div>
+                {% else %}
+                    <div class="submission-preview">
+                        <div class="submission-preview__header">
+                            <div>
+                                <p class="page-kicker">Preview Kobo</p>
+                                <h2>Submission #{{ selectedSubmission.id }}</h2>
+                                <p>
+                                    {% if selectedSubmission.kobo_id %}
+                                        Kobo ID {{ selectedSubmission.kobo_id }}
+                                    {% endif %}
+                                    {% if selectedSubmission.kobo_uuid %}
+                                        {% if selectedSubmission.kobo_id %} · {% endif %}UUID {{ selectedSubmission.kobo_uuid }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <span class="submission-status status-{{ selectedSubmission.status }}">{{ statusLabels[selectedSubmission.status]|default(selectedSubmission.status) }}</span>
+                        </div>
+
+                        {% if not preview.ok %}
+                            <div class="preview-warning">{{ preview.error }}</div>
+                        {% else %}
+                            <section class="preview-section">
+                                <h3>Risposte</h3>
+                                {% if preview.answers %}
+                                    <div class="preview-table">
+                                        {% for answer in preview.answers %}
+                                            <div class="preview-table__row">
+                                                <div>
+                                                    <strong>{{ answer.label|e }}</strong>
+                                                    {% if answer.label == answer.key %}
+                                                        <small>Chiave non mappata</small>
+                                                    {% endif %}
+                                                </div>
+                                                <p>{{ answer.value|e|nl2br }}</p>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="muted">Nessuna risposta applicativa trovata nella submission.</p>
+                                {% endif %}
+                            </section>
+
+                            <section class="preview-section">
+                                <h3>Allegati</h3>
+                                {% if preview.attachments %}
+                                    <div class="preview-attachments">
+                                        {% for attachment in preview.attachments %}
+                                            <article class="preview-attachment">
+                                                <strong>{{ attachment.label|e }}</strong>
+                                                {% if attachment.kind == 'image' %}
+                                                    <img src="{{ attachment.url }}" alt="{{ attachment.label|e }}">
+                                                {% elseif attachment.kind == 'audio' %}
+                                                    <audio controls preload="metadata" src="{{ attachment.url }}"></audio>
+                                                {% elseif attachment.kind == 'video' %}
+                                                    <video controls preload="metadata" src="{{ attachment.url }}"></video>
+                                                {% else %}
+                                                    <a class="preview-download" href="{{ attachment.url }}" target="_blank" rel="noopener">Apri allegato</a>
+                                                {% endif %}
+                                                <small>{{ attachment.filename|e }} · {{ attachment.mime|e }}</small>
+                                            </article>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="muted">Nessun allegato Kobo disponibile.</p>
+                                {% endif %}
+                            </section>
+
+                            <section class="preview-section">
+                                <h3>Metadati Kobo</h3>
+                                {% if preview.metadata %}
+                                    <div class="preview-table compact">
+                                        {% for metadata in preview.metadata %}
+                                            <div class="preview-table__row">
+                                                <div><strong>{{ metadata.key|e }}</strong></div>
+                                                <p>{{ metadata.value|e }}</p>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="muted">Nessun metadato Kobo disponibile.</p>
+                                {% endif %}
+                            </section>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    {% else %}
+        <section class="empty-state full">
+            <h2>Nessuna submission trovata</h2>
+            <p>Quando invierai un modulo dalla app VIM, lo troverai in questa area.</p>
+        </section>
+    {% endif %}
+</main>

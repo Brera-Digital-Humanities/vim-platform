@@ -2,9 +2,11 @@
 
 use Illuminate\Http\Request;
 use Quivi\Kobo\Classes\Api as KoboApi;
+use Quivi\Kobo\Classes\SubmissionPreview;
 use Quivi\Kobo\Classes\SubmissionService;
 use Quivi\Kobo\Models\Submission;
 use Quivi\Profile\Classes\JwtMiddleware;
+use Winter\User\Facades\Auth;
 use Winter\Storm\Exception\ApplicationException;
 
 Route::group(['prefix' => 'api/v1/kobo'], function () {
@@ -97,3 +99,26 @@ Route::group(['prefix' => 'api/v1/kobo'], function () {
         });
     });
 });
+
+Route::get('user/submission-media/{recordId}/{attachmentIndex}', function ($recordId, $attachmentIndex) {
+    $user = Auth::getUser();
+    if (!$user) {
+        return Response::make('Access denied.', 403, ['Content-Type' => 'text/plain']);
+    }
+
+    $submission = Submission::where('id', (int) $recordId)
+        ->where('user_id', $user->id)
+        ->first();
+
+    if (!$submission) {
+        return Response::make(trans('quivi.kobo::lang.review.errors.submission_not_found'), 404, ['Content-Type' => 'text/plain']);
+    }
+
+    try {
+        $media = SubmissionPreview::make()->downloadAttachment($submission, (int) $attachmentIndex);
+    } catch (\Throwable $ex) {
+        return Response::make($ex->getMessage(), 500, ['Content-Type' => 'text/plain']);
+    }
+
+    return Response::make($media['body'], 200, $media['headers']);
+})->middleware('web');

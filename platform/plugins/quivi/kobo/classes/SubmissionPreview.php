@@ -26,15 +26,17 @@ class SubmissionPreview
     ];
 
     protected Api $api;
+    protected ?string $mediaUrlBase;
 
-    public function __construct(?Api $api = null)
+    public function __construct(?Api $api = null, ?string $mediaUrlBase = null)
     {
         $this->api = $api ?: Api::make();
+        $this->mediaUrlBase = $mediaUrlBase;
     }
 
-    public static function make(?Api $api = null): self
+    public static function make(?Api $api = null, ?string $mediaUrlBase = null): self
     {
-        return new self($api);
+        return new self($api, $mediaUrlBase);
     }
 
     public function build(Submission $submission): array
@@ -253,12 +255,21 @@ class SubmissionPreview
                 'label' => $field['label'] ?? $filename,
                 'mime' => $this->attachmentMime($attachment, $filename),
                 'kind' => $this->attachmentKind($attachment, $filename),
-                'url' => Backend::url('quivi/kobo/submissions/media/' . $submission->id . '/' . $index),
+                'url' => $this->mediaUrl($submission, $index),
                 'size' => $attachment['size'] ?? $attachment['filesize'] ?? null,
             ];
         }
 
         return $attachments;
+    }
+
+    protected function mediaUrl(Submission $submission, int $index): string
+    {
+        if ($this->mediaUrlBase) {
+            return rtrim($this->mediaUrlBase, '/') . '/' . $submission->id . '/' . $index;
+        }
+
+        return Backend::url('quivi/kobo/submissions/media/' . $submission->id . '/' . $index);
     }
 
     protected function buildMetadata(array $data): array

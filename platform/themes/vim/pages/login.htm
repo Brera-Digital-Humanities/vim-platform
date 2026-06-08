@@ -1,0 +1,61 @@
+title = "Login"
+url = "/login"
+layout = "default"
+is_hidden = 0
+
+[account]
+redirect = "user/submissions"
+paramCode = "code"
+forceSecure = 0
+requirePassword = 0
+==
+function onStart()
+{
+    if (Auth::check()) {
+        return Redirect::to('/user/submissions');
+    }
+}
+==
+{% put page_title %}Area riservata - VIM{% endput %}
+
+<main class="auth-page">
+    <section class="auth-card">
+        <div class="auth-card__brand">
+            <img src="{{ 'assets/images/vim-icon-192.png'|theme }}" alt="VIM">
+            <span>La valigia immateriale</span>
+        </div>
+
+        <div class="auth-card__copy">
+            <p class="page-kicker">Area riservata</p>
+            <h1>Accedi alle tue submission</h1>
+            <p>Entra con le credenziali usate per la app VIM e consulta i moduli inviati dal campo.</p>
+        </div>
+
+        {{ form_ajax('onSignin', { class: 'auth-form' }) }}
+            <label for="userSigninLogin">Email o username</label>
+            <input
+                name="login"
+                type="text"
+                id="userSigninLogin"
+                autocomplete="username"
+                required>
+
+            <label for="userSigninPassword">Password</label>
+            <input
+                name="password"
+                type="password"
+                id="userSigninPassword"
+                autocomplete="current-password"
+                required>
+
+            {% if rememberLoginMode == 'ask' %}
+                <label class="auth-form__check">
+                    <input name="remember" type="checkbox" value="1">
+                    <span>Resta collegato</span>
+                </label>
+            {% endif %}
+
+            <button type="submit">Accedi</button>
+        {{ form_close() }}
+    </section>
+</main>

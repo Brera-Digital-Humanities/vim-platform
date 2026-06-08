@@ -18,3 +18,14 @@
         {% set pageTitle = page.title %}
     {% endif %}
     <body class="page-{{ pageId }} layout-{{ this.layout.id }}">
+        <header class="site-header">
+            <a class="site-header__brand" href="/">
+                <img src="{{ 'assets/images/vim-icon-192.png'|theme }}" alt="VIM">
+                <span>VIM</span>
+            </a>
+
+            <nav class="site-header__nav" aria-label="Navigazione principale">
+                <a class="site-header__link" href="/">Istruzioni</a>
+                <a class="site-header__access" href="/login">Area riservata</a>
+            </nav>
+        </header>
