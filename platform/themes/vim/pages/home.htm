@@ -2,75 +2,57 @@ title = "VIM App"
 url = "/"
 layout = "default"
 ==
-{% put page_title %}VIM App - Instructions{% endput %}
+{% put page_title %}{{ 'themes.vim::lang.home.page_title'|trans }}{% endput %}
 
 <main class="guide-page">
-    <nav class="language-switch" aria-label="Language selector">
-        <button class="language-btn active" type="button" data-lang-option="en" aria-pressed="true">
-            <span class="flag flag-en" aria-hidden="true"></span>
-            <span>English</span>
-        </button>
-        <button class="language-btn" type="button" data-lang-option="it" aria-pressed="false">
-            <span class="flag flag-it" aria-hidden="true"></span>
-            <span>Italiano</span>
-        </button>
-        <button class="language-btn" type="button" data-lang-option="ar" aria-pressed="false">
-            <span class="flag flag-ar" aria-hidden="true"></span>
-            <span>العربية</span>
-        </button>
-    </nav>
-
     <section class="guide-hero">
         <div class="guide-hero-copy">
-            <div class="guide-kicker" data-i18n="hero.kicker">The immaterial suitcase</div>
-            <h1 data-i18n="hero.title">Use the VIM app to collect and submit field forms.</h1>
-            <p data-i18n="hero.copy">
-                Open the app from your phone, install it on the Home screen and fill in forms even when the connection is unstable.
-                Submissions are queued and synced as soon as possible.
-            </p>
+            <div class="guide-kicker">{{ 'themes.vim::lang.home.hero.kicker'|trans }}</div>
+            <h1>{{ 'themes.vim::lang.home.hero.title'|trans }}</h1>
+            <p>{{ 'themes.vim::lang.home.hero.copy'|trans }}</p>
             <div class="guide-actions">
-                <a class="guide-btn primary" href="https://app.vim-data.org" target="_blank" rel="noopener" data-i18n="hero.openApp">Open app.vim-data.org</a>
-                <a class="guide-btn secondary" href="#installazione" data-i18n="hero.installLink">How to install it</a>
+                <a class="guide-btn primary" href="https://app.vim-data.org" target="_blank" rel="noopener">{{ 'themes.vim::lang.home.hero.open_app'|trans }}</a>
+                <a class="guide-btn secondary" href="#installazione">{{ 'themes.vim::lang.home.hero.install_link'|trans }}</a>
             </div>
         </div>
 
-        <div class="access-panel" aria-label="Quick access to the VIM app" data-i18n-aria-label="access.ariaLabel">
+        <div class="access-panel" aria-label="{{ 'themes.vim::lang.home.access.aria_label'|trans }}">
             <div class="access-icon">
                 <img src="{{ 'assets/images/vim-icon-192.png'|theme }}" alt="" aria-hidden="true">
             </div>
             <div>
-                <div class="access-title" data-i18n="access.title">Quick access</div>
+                <div class="access-title">{{ 'themes.vim::lang.home.access.title'|trans }}</div>
                 <a class="access-link" href="https://app.vim-data.org" target="_blank" rel="noopener">app.vim-data.org</a>
             </div>
             <div class="qr-wrap">
-                <img src="{{ 'assets/images/app-qr.svg'|theme }}" alt="QR code to open vim-data.org" data-i18n-alt="access.qrAlt">
+                <img src="{{ 'assets/images/app-qr.svg'|theme }}" alt="{{ 'themes.vim::lang.home.access.qr_alt'|trans }}">
             </div>
-            <p class="qr-note" data-i18n="access.qrNote">On mobile, tap the link. From a computer, scan this QR code with your phone camera.</p>
+            <p class="qr-note">{{ 'themes.vim::lang.home.access.qr_note'|trans }}</p>
         </div>
     </section>
 
     <section class="guide-section" id="installazione">
         <div class="section-heading">
             <span>01</span>
-            <h2 data-i18n="install.title">Install the App on your Device</h2>
+            <h2>{{ 'themes.vim::lang.home.install.title'|trans }}</h2>
         </div>
         <div class="steps-grid">
             <article class="step-card">
                 <div class="step-os">iPhone / iPad</div>
                 <ol>
-                    <li data-i18n="install.ios.1">Open <strong>app.vim-data.org</strong> with Safari.</li>
-                    <li data-i18n="install.ios.2">Tap the share button.</li>
-                    <li data-i18n="install.ios.3">Choose <strong>Add to Home Screen</strong>.</li>
-                    <li data-i18n="install.ios.4">Confirm with <strong>Add</strong>.</li>
+                    <li>{{ 'themes.vim::lang.home.install.ios_1'|trans }}</li>
+                    <li>{{ 'themes.vim::lang.home.install.ios_2'|trans }}</li>
+                    <li>{{ 'themes.vim::lang.home.install.ios_3'|trans }}</li>
+                    <li>{{ 'themes.vim::lang.home.install.ios_4'|trans }}</li>
                 </ol>
             </article>
             <article class="step-card">
                 <div class="step-os">Android</div>
                 <ol>
-                    <li data-i18n="install.android.1">Open <strong>app.vim-data.org</strong> with Chrome.</li>
-                    <li data-i18n="install.android.2">When it appears, tap <strong>Install app</strong>.</li>
-                    <li data-i18n="install.android.3">If it does not appear, open the browser menu.</li>
-                    <li data-i18n="install.android.4">Choose <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>
+                    <li>{{ 'themes.vim::lang.home.install.android_1'|trans }}</li>
+                    <li>{{ 'themes.vim::lang.home.install.android_2'|trans }}</li>
+                    <li>{{ 'themes.vim::lang.home.install.android_3'|trans }}</li>
+                    <li>{{ 'themes.vim::lang.home.install.android_4'|trans }}</li>
                 </ol>
             </article>
         </div>
@@ -79,24 +61,24 @@ layout = "default"
     <section class="guide-section">
         <div class="section-heading">
             <span>02</span>
-            <h2 data-i18n="workflow.title">Fill in and submit a form</h2>
+            <h2>{{ 'themes.vim::lang.home.workflow.title'|trans }}</h2>
         </div>
         <div class="workflow">
             <article class="workflow-item">
-                <strong data-i18n="workflow.login.title">Sign in</strong>
-                <p data-i18n="workflow.login.copy">Enter the username and password provided by the VIM project.</p>
+                <strong>{{ 'themes.vim::lang.home.workflow.login_title'|trans }}</strong>
+                <p>{{ 'themes.vim::lang.home.workflow.login_copy'|trans }}</p>
             </article>
             <article class="workflow-item">
-                <strong data-i18n="workflow.fill.title">Fill in</strong>
-                <p data-i18n="workflow.fill.copy">Open <em>Fill in form</em>, choose the language and complete the required fields.</p>
+                <strong>{{ 'themes.vim::lang.home.workflow.fill_title'|trans }}</strong>
+                <p>{{ 'themes.vim::lang.home.workflow.fill_copy'|trans }}</p>
             </article>
             <article class="workflow-item">
-                <strong data-i18n="workflow.media.title">Attach media</strong>
-                <p data-i18n="workflow.media.copy">Record audio or video, take photos or upload files already on the device.</p>
+                <strong>{{ 'themes.vim::lang.home.workflow.media_title'|trans }}</strong>
+                <p>{{ 'themes.vim::lang.home.workflow.media_copy'|trans }}</p>
             </article>
             <article class="workflow-item">
-                <strong data-i18n="workflow.submit.title">Submit</strong>
-                <p data-i18n="workflow.submit.copy">Tap <em>Completed</em> and choose automatic or manual sending. If you are offline, the form stays in the queue.</p>
+                <strong>{{ 'themes.vim::lang.home.workflow.submit_title'|trans }}</strong>
+                <p>{{ 'themes.vim::lang.home.workflow.submit_copy'|trans }}</p>
             </article>
         </div>
     </section>
@@ -104,47 +86,47 @@ layout = "default"
     <section class="guide-section">
         <div class="section-heading">
             <span>03</span>
-            <h2 data-i18n="screens.title">Reference screens</h2>
+            <h2>{{ 'themes.vim::lang.home.screens.title'|trans }}</h2>
         </div>
         <div class="shots-grid">
             <article class="phone-shot image-shot">
-                <img class="screen-image" src="{{ 'assets/images/screens/screen_login.png'|theme }}" alt="VIM app sign-in screen" data-i18n-alt="screen.login.alt">
-                <p data-i18n="screen.login.copy">Sign in with the credentials assigned to you.</p>
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_login.png'|theme }}" alt="{{ 'themes.vim::lang.home.screens.login_alt'|trans }}">
+                <p>{{ 'themes.vim::lang.home.screens.login_copy'|trans }}</p>
             </article>
 
             <article class="phone-shot image-shot">
-                <img class="screen-image" src="{{ 'assets/images/screens/screen_home.png'|theme }}" alt="VIM app home screen" data-i18n-alt="screen.home.alt">
-                <p data-i18n="screen.home.copy">The Home screen contains the main actions and archive.</p>
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_home.png'|theme }}" alt="{{ 'themes.vim::lang.home.screens.home_alt'|trans }}">
+                <p>{{ 'themes.vim::lang.home.screens.home_copy'|trans }}</p>
             </article>
 
             <article class="phone-shot image-shot">
-                <img class="screen-image" src="{{ 'assets/images/screens/screen_form.png'|theme }}" alt="VIM app form screen" data-i18n-alt="screen.form.alt">
-                <p data-i18n="screen.form.copy">You can save a draft and continue later.</p>
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_form.png'|theme }}" alt="{{ 'themes.vim::lang.home.screens.form_alt'|trans }}">
+                <p>{{ 'themes.vim::lang.home.screens.form_copy'|trans }}</p>
             </article>
 
             <article class="phone-shot image-shot">
-                <img class="screen-image" src="{{ 'assets/images/screens/screen_record.png'|theme }}" alt="VIM app media recording screen" data-i18n-alt="screen.record.alt">
-                <p data-i18n="screen.record.copy">Record audio or video directly from the browser when the form asks for it.</p>
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_record.png'|theme }}" alt="{{ 'themes.vim::lang.home.screens.record_alt'|trans }}">
+                <p>{{ 'themes.vim::lang.home.screens.record_copy'|trans }}</p>
             </article>
 
             <article class="phone-shot image-shot">
-                <img class="screen-image" src="{{ 'assets/images/screens/screen_complete.png'|theme }}" alt="VIM app completed form screen" data-i18n-alt="screen.complete.alt">
-                <p data-i18n="screen.complete.copy">Complete the form when all required information has been entered.</p>
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_complete.png'|theme }}" alt="{{ 'themes.vim::lang.home.screens.complete_alt'|trans }}">
+                <p>{{ 'themes.vim::lang.home.screens.complete_copy'|trans }}</p>
             </article>
 
             <article class="phone-shot image-shot">
-                <img class="screen-image" src="{{ 'assets/images/screens/screen_send.png'|theme }}" alt="VIM app submission queue screen" data-i18n-alt="screen.send.alt">
-                <p data-i18n="screen.send.copy">Send pending forms or keep them in the queue until the connection is available.</p>
+                <img class="screen-image" src="{{ 'assets/images/screens/screen_send.png'|theme }}" alt="{{ 'themes.vim::lang.home.screens.send_alt'|trans }}">
+                <p>{{ 'themes.vim::lang.home.screens.send_copy'|trans }}</p>
             </article>
         </div>
     </section>
 
     <section class="guide-note">
-        <h2 data-i18n="field.title">Before going into the field</h2>
+        <h2>{{ 'themes.vim::lang.home.field.title'|trans }}</h2>
         <ul>
-            <li data-i18n="field.1">Open the app at least once with an active connection.</li>
-            <li data-i18n="field.2">Check that sign-in, microphone, camera and free storage work.</li>
-            <li data-i18n="field.3">Send whenever you can: data remains on the device, but it depends on browser limits.</li>
+            <li>{{ 'themes.vim::lang.home.field.item_1'|trans }}</li>
+            <li>{{ 'themes.vim::lang.home.field.item_2'|trans }}</li>
+            <li>{{ 'themes.vim::lang.home.field.item_3'|trans }}</li>
         </ul>
     </section>
 </main>

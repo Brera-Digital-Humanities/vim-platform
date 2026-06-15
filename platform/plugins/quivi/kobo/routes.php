@@ -103,7 +103,7 @@ Route::group(['prefix' => 'api/v1/kobo'], function () {
 Route::get('user/submission-media/{recordId}/{attachmentIndex}', function ($recordId, $attachmentIndex) {
     $user = Auth::getUser();
     if (!$user) {
-        return Response::make('Access denied.', 403, ['Content-Type' => 'text/plain']);
+        return Response::make(trans('quivi.kobo::lang.review.errors.access_denied'), 403, ['Content-Type' => 'text/plain']);
     }
 
     $submission = Submission::where('id', (int) $recordId)

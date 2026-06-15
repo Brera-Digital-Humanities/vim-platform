@@ -29,6 +29,8 @@
             'submission_not_found_by_uuid' => 'لم يتم العثور على إرسال Kobo باستخدام UUID :uuid.',
             'submission_not_found' => 'لم يتم العثور على الإرسال.',
             'authenticated_user_not_found' => 'لم يتم العثور على المستخدم المصادق عليه.',
+            'access_denied' => 'الوصول مرفوض.',
+            'kobo_unavailable' => 'لم يرسل Kobo البيانات. يرجى المحاولة مرة أخرى بعد قليل.',
         ],
     ],
     'api' => [

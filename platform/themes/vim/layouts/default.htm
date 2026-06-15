@@ -1,5 +1,22 @@
 description = "Default layout"
 ==
+function onStart()
+{
+    $locale = strtolower((string) App::getLocale());
+
+    if (!in_array($locale, ['it', 'en', 'ar'], true)) {
+        $locale = 'it';
+    }
+
+    $this['activeLocale'] = $locale;
+    $this['htmlDirection'] = $locale === 'ar' ? 'rtl' : 'ltr';
+    $this['languageOptions'] = [
+        ['code' => 'en', 'flag' => 'flag-en'],
+        ['code' => 'it', 'flag' => 'flag-it'],
+        ['code' => 'ar', 'flag' => 'flag-ar'],
+    ];
+}
+==
 {% partial "site/header" %}
 
     {% page %}

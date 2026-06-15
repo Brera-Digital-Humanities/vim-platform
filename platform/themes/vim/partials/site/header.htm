@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ activeLocale|default('it') }}" dir="{{ htmlDirection|default('ltr') }}">
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -24,8 +24,23 @@
                 <span>VIM</span>
             </a>
 
-            <nav class="site-header__nav" aria-label="Navigazione principale">
-                <a class="site-header__link" href="/">Istruzioni</a>
-                <a class="site-header__access" href="/login">Area riservata</a>
+            <nav class="site-header__nav" aria-label="{{ 'themes.vim::lang.nav.main_navigation'|trans }}">
+                <a class="site-header__link" href="/">{{ 'themes.vim::lang.nav.instructions'|trans }}</a>
+                <a class="site-header__access" href="/login">{{ 'themes.vim::lang.nav.reserved_area'|trans }}</a>
+
+                <div class="language-switch" aria-label="{{ 'themes.vim::lang.nav.language_selector'|trans }}">
+                    {% for option in languageOptions %}
+                        {% set isActiveLanguage = activeLocale == option.code %}
+                        <a
+                            class="language-btn {{ isActiveLanguage ? 'active' : '' }}"
+                            href="?lang={{ option.code }}"
+                            hreflang="{{ option.code }}"
+                            lang="{{ option.code }}"
+                            {% if isActiveLanguage %}aria-current="true"{% endif %}>
+                            <span class="flag {{ option.flag }}" aria-hidden="true"></span>
+                            <span>{{ ('themes.vim::lang.language.' ~ option.code)|trans }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
             </nav>
         </header>

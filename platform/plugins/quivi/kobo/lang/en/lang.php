@@ -29,6 +29,8 @@
             'submission_not_found_by_uuid' => 'Kobo submission was not found using UUID :uuid.',
             'submission_not_found' => 'Submission not found.',
             'authenticated_user_not_found' => 'Authenticated user not found.',
+            'access_denied' => 'Access denied.',
+            'kobo_unavailable' => 'Kobo did not return the data. Please try again in a few moments.',
         ],
     ],
     'api' => [

@@ -21,9 +21,9 @@ function onStart()
     $this['selectedMissing'] = false;
     $this['preview'] = null;
     $this['statusLabels'] = [
-        'created' => 'Creato',
-        'done' => 'Inviato',
-        'error' => 'Errore',
+        'created' => trans('themes.vim::lang.account.status.created'),
+        'done' => trans('themes.vim::lang.account.status.done'),
+        'error' => trans('themes.vim::lang.account.status.error'),
     ];
 
     $id = $this->param('id');
@@ -44,23 +44,23 @@ function onStart()
     $this['preview'] = \Quivi\Kobo\Classes\SubmissionPreview::make(null, url('/user/submission-media'))->build($selected);
 }
 ==
-{% put page_title %}Le mie submission - VIM{% endput %}
+{% put page_title %}{{ 'themes.vim::lang.account.page_title'|trans }}{% endput %}
 
 <main class="account-page">
     <header class="account-page__header">
         <div>
-            <p class="page-kicker">Area riservata</p>
-            <h1>Le tue submission</h1>
-            <p>Consulta i moduli inviati dalla app VIM e apri la preview dei dati pubblicati su Kobo.</p>
+            <p class="page-kicker">{{ 'themes.vim::lang.account.kicker'|trans }}</p>
+            <h1>{{ 'themes.vim::lang.account.title'|trans }}</h1>
+            <p>{{ 'themes.vim::lang.account.intro'|trans }}</p>
         </div>
-        <a class="account-page__logout" href="#" data-request="onLogout" data-request-data="redirect: '/'">Esci</a>
+        <a class="account-page__logout" href="#" data-request="onLogout" data-request-data="redirect: '/'">{{ 'themes.vim::lang.account.logout'|trans }}</a>
     </header>
 
     {% if submissions|length %}
         <div class="submissions-layout">
             <section class="submissions-panel">
                 <div class="submissions-panel__head">
-                    <h2>Submission inviate</h2>
+                    <h2>{{ 'themes.vim::lang.account.submissions_title'|trans }}</h2>
                     <span>{{ submissions|length }}</span>
                 </div>
 
@@ -76,11 +76,11 @@ function onStart()
                                     {% if submission.created_at %}
                                         {{ submission.created_at|date('d/m/Y H:i') }}
                                     {% else %}
-                                        Data non disponibile
+                                        {{ 'themes.vim::lang.account.data_missing'|trans }}
                                     {% endif %}
                                 </small>
                             </span>
-                            <span class="submission-status status-{{ submission.status }}">{{ submission.status }}</span>
+                            <span class="submission-status status-{{ submission.status }}">{{ statusLabels[submission.status]|default(submission.status) }}</span>
                         </a>
                     {% endfor %}
                 </div>
@@ -89,20 +89,20 @@ function onStart()
             <section class="submission-preview-panel">
                 {% if selectedMissing %}
                     <div class="empty-state">
-                        <h2>Submission non trovata</h2>
-                        <p>La submission richiesta non esiste oppure non appartiene al tuo account.</p>
+                        <h2>{{ 'themes.vim::lang.account.missing_title'|trans }}</h2>
+                        <p>{{ 'themes.vim::lang.account.missing_copy'|trans }}</p>
                     </div>
                 {% elseif not selectedSubmission %}
                     <div class="empty-state">
-                        <h2>Seleziona una submission</h2>
-                        <p>Clicca su un elemento della lista per vedere risposte, allegati e metadati Kobo.</p>
+                        <h2>{{ 'themes.vim::lang.account.select_title'|trans }}</h2>
+                        <p>{{ 'themes.vim::lang.account.select_copy'|trans }}</p>
                     </div>
                 {% else %}
                     <div class="submission-preview">
                         <div class="submission-preview__header">
                             <div>
-                                <p class="page-kicker">Preview Kobo</p>
-                                <h2>Submission #{{ selectedSubmission.id }}</h2>
+                                <p class="page-kicker">{{ 'themes.vim::lang.account.preview_kicker'|trans }}</p>
+                                <h2>{{ 'themes.vim::lang.account.submission_number'|trans({ id: selectedSubmission.id }) }}</h2>
                                 <p>
                                     {% if selectedSubmission.kobo_id %}
                                         Kobo ID {{ selectedSubmission.kobo_id }}
@@ -119,7 +119,7 @@ function onStart()
                             <div class="preview-warning">{{ preview.error }}</div>
                         {% else %}
                             <section class="preview-section">
-                                <h3>Risposte</h3>
+                                <h3>{{ 'quivi.kobo::lang.review.answers'|trans }}</h3>
                                 {% if preview.answers %}
                                     <div class="preview-table">
                                         {% for answer in preview.answers %}
@@ -127,7 +127,7 @@ function onStart()
                                                 <div>
                                                     <strong>{{ answer.label|e }}</strong>
                                                     {% if answer.label == answer.key %}
-                                                        <small>Chiave non mappata</small>
+                                                        <small>{{ 'quivi.kobo::lang.review.unmapped_key'|trans }}</small>
                                                     {% endif %}
                                                 </div>
                                                 <p>{{ answer.value|e|nl2br }}</p>
@@ -135,12 +135,12 @@ function onStart()
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    <p class="muted">Nessuna risposta applicativa trovata nella submission.</p>
+                                    <p class="muted">{{ 'quivi.kobo::lang.review.no_answers'|trans }}</p>
                                 {% endif %}
                             </section>
 
                             <section class="preview-section">
-                                <h3>Allegati</h3>
+                                <h3>{{ 'quivi.kobo::lang.review.attachments'|trans }}</h3>
                                 {% if preview.attachments %}
                                     <div class="preview-attachments">
                                         {% for attachment in preview.attachments %}
@@ -153,19 +153,19 @@ function onStart()
                                                 {% elseif attachment.kind == 'video' %}
                                                     <video controls preload="metadata" src="{{ attachment.url }}"></video>
                                                 {% else %}
-                                                    <a class="preview-download" href="{{ attachment.url }}" target="_blank" rel="noopener">Apri allegato</a>
+                                                    <a class="preview-download" href="{{ attachment.url }}" target="_blank" rel="noopener">{{ 'quivi.kobo::lang.review.open_attachment'|trans }}</a>
                                                 {% endif %}
                                                 <small>{{ attachment.filename|e }} · {{ attachment.mime|e }}</small>
                                             </article>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    <p class="muted">Nessun allegato Kobo disponibile.</p>
+                                    <p class="muted">{{ 'quivi.kobo::lang.review.no_attachments'|trans }}</p>
                                 {% endif %}
                             </section>
 
                             <section class="preview-section">
-                                <h3>Metadati Kobo</h3>
+                                <h3>{{ 'quivi.kobo::lang.review.metadata'|trans }}</h3>
                                 {% if preview.metadata %}
                                     <div class="preview-table compact">
                                         {% for metadata in preview.metadata %}
@@ -176,7 +176,7 @@ function onStart()
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    <p class="muted">Nessun metadato Kobo disponibile.</p>
+                                    <p class="muted">{{ 'quivi.kobo::lang.review.no_metadata'|trans }}</p>
                                 {% endif %}
                             </section>
                         {% endif %}
@@ -186,8 +186,8 @@ function onStart()
         </div>
     {% else %}
         <section class="empty-state full">
-            <h2>Nessuna submission trovata</h2>
-            <p>Quando invierai un modulo dalla app VIM, lo troverai in questa area.</p>
+            <h2>{{ 'themes.vim::lang.account.no_submissions_title'|trans }}</h2>
+            <p>{{ 'themes.vim::lang.account.no_submissions_copy'|trans }}</p>
         </section>
     {% endif %}
 </main>

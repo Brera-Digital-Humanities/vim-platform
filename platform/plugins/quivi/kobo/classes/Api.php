@@ -10,6 +10,7 @@ class Api
 {
     public const DEFAULT_BASE_URL = 'https://eu.kobotoolbox.org';
     public const API_PREFIX = '/api/v2';
+    protected const RETRYABLE_STATUS_CODES = [0, 408, 429, 500, 502, 503, 504];
 
     protected string $baseUrl;
 
@@ -175,29 +176,65 @@ class Api
 
     public function download(string $path, array $query = []): array
     {
-        $response = Http::make($this->buildDownloadUrl($path, $query), 'GET', function (Http $http) {
-            $http->timeout($this->timeout);
-            $http->header('Accept', '*/*');
+        $lastResponse = null;
+        $lastException = null;
+        $attempts = $this->retryAttempts('GET');
 
-            if ($this->token) {
-                $http->header('Authorization', 'Token ' . $this->token);
+        for ($attempt = 1; $attempt <= $attempts; $attempt++) {
+            try {
+                $response = Http::make($this->buildDownloadUrl($path, $query), 'GET', function (Http $http) {
+                    $http->timeout($this->timeout);
+                    $http->header('Accept', '*/*');
+
+                    if ($this->token) {
+                        $http->header('Authorization', 'Token ' . $this->token);
+                    }
+
+                    $this->configureSsl($http);
+                })->send();
+            } catch (\Throwable $ex) {
+                $lastException = $ex;
+
+                if ($this->shouldRetryException('GET', $attempt, $attempts)) {
+                    $this->waitBeforeRetry($attempt);
+                    continue;
+                }
+
+                throw new ApplicationException(trans('quivi.kobo::lang.api.errors.media_request_failed', [
+                    'status' => 0,
+                    'body' => $ex->getMessage(),
+                ]));
             }
 
-            $this->configureSsl($http);
-        })->send();
+            if ($response->ok) {
+                return [
+                    'body' => $response->body,
+                    'headers' => $response->headers,
+                    'status' => $response->code,
+                ];
+            }
 
-        if (!$response->ok) {
+            $lastResponse = $response;
+
+            if ($this->shouldRetryResponse('GET', $response, $attempt, $attempts)) {
+                $this->waitBeforeRetry($attempt);
+                continue;
+            }
+
+            break;
+        }
+
+        if ($lastResponse) {
             throw new ApplicationException(trans('quivi.kobo::lang.api.errors.media_request_failed', [
-                'status' => $response->code,
-                'body' => $response->body,
+                'status' => $lastResponse->code,
+                'body' => $lastResponse->body,
             ]));
         }
 
-        return [
-            'body' => $response->body,
-            'headers' => $response->headers,
-            'status' => $response->code,
-        ];
+        throw new ApplicationException(trans('quivi.kobo::lang.api.errors.media_request_failed', [
+            'status' => 0,
+            'body' => $lastException ? $lastException->getMessage() : 'Unknown error',
+        ]));
     }
 
     public function submitOpenRosa(Request $request): array
@@ -323,38 +360,120 @@ class Api
 
     protected function requestRaw(string $method, string $path, array $query = [], ?array $payload = null): string
     {
-        $response = Http::make($this->buildUrl($path, $query), strtoupper($method), function (Http $http) use ($payload) {
-            $http->timeout($this->timeout);
-            $http->header('Accept', 'application/json');
+        $method = strtoupper($method);
+        $encodedPayload = null;
+        $lastResponse = null;
+        $lastException = null;
+        $attempts = $this->retryAttempts($method);
 
-            if ($this->token) {
-                $http->header('Authorization', 'Token ' . $this->token);
+        if ($payload !== null) {
+            $encodedPayload = json_encode($payload);
+
+            if ($encodedPayload === false) {
+                throw new ApplicationException(trans('quivi.kobo::lang.api.errors.payload_encode_failed', [
+                    'error' => json_last_error_msg(),
+                ]));
             }
+        }
 
-            $this->configureSsl($http);
+        for ($attempt = 1; $attempt <= $attempts; $attempt++) {
+            try {
+                $response = Http::make($this->buildUrl($path, $query), $method, function (Http $http) use ($encodedPayload) {
+                    $http->timeout($this->timeout);
+                    $http->header('Accept', 'application/json');
 
-            if ($payload !== null) {
-                $encodedPayload = json_encode($payload);
+                    if ($this->token) {
+                        $http->header('Authorization', 'Token ' . $this->token);
+                    }
 
-                if ($encodedPayload === false) {
-                    throw new ApplicationException(trans('quivi.kobo::lang.api.errors.payload_encode_failed', [
-                        'error' => json_last_error_msg(),
-                    ]));
+                    $this->configureSsl($http);
+
+                    if ($encodedPayload !== null) {
+                        $http->header('Content-Type', 'application/json');
+                        $http->setOption(CURLOPT_POSTFIELDS, $encodedPayload);
+                    }
+                })->send();
+            } catch (\Throwable $ex) {
+                $lastException = $ex;
+
+                if ($this->shouldRetryException($method, $attempt, $attempts)) {
+                    $this->waitBeforeRetry($attempt);
+                    continue;
                 }
 
-                $http->header('Content-Type', 'application/json');
-                $http->setOption(CURLOPT_POSTFIELDS, $encodedPayload);
+                throw new ApplicationException(trans('quivi.kobo::lang.api.errors.request_failed', [
+                    'status' => 0,
+                    'body' => $ex->getMessage(),
+                ]));
             }
-        })->send();
 
-        if (!$response->ok) {
+            if ($response->ok) {
+                return $response->body;
+            }
+
+            $lastResponse = $response;
+
+            if ($this->shouldRetryResponse($method, $response, $attempt, $attempts)) {
+                $this->waitBeforeRetry($attempt);
+                continue;
+            }
+
+            break;
+        }
+
+        if ($lastResponse) {
             throw new ApplicationException(trans('quivi.kobo::lang.api.errors.request_failed', [
-                'status' => $response->code,
-                'body' => $response->body,
+                'status' => $lastResponse->code,
+                'body' => $lastResponse->body,
             ]));
         }
 
-        return $response->body;
+        throw new ApplicationException(trans('quivi.kobo::lang.api.errors.request_failed', [
+            'status' => 0,
+            'body' => $lastException ? $lastException->getMessage() : 'Unknown error',
+        ]));
+    }
+
+    protected function retryAttempts(string $method): int
+    {
+        if (!$this->isRetryableMethod($method)) {
+            return 1;
+        }
+
+        return max(1, (int) env('KOBO_API_ATTEMPTS', 3));
+    }
+
+    protected function isRetryableMethod(string $method): bool
+    {
+        return in_array(strtoupper($method), ['GET', 'HEAD'], true);
+    }
+
+    protected function shouldRetryResponse(string $method, $response, int $attempt, int $attempts): bool
+    {
+        if ($attempt >= $attempts || !$this->isRetryableMethod($method)) {
+            return false;
+        }
+
+        return in_array((int) ($response->code ?? 0), self::RETRYABLE_STATUS_CODES, true);
+    }
+
+    protected function shouldRetryException(string $method, int $attempt, int $attempts): bool
+    {
+        return $attempt < $attempts && $this->isRetryableMethod($method);
+    }
+
+    protected function waitBeforeRetry(int $attempt): void
+    {
+        $baseDelay = max(0, (int) env('KOBO_API_RETRY_DELAY_MS', 400));
+
+        if ($baseDelay <= 0) {
+            return;
+        }
+
+        $maxDelay = max($baseDelay, (int) env('KOBO_API_RETRY_MAX_DELAY_MS', 2000));
+        $delay = min($maxDelay, $baseDelay * (2 ** max(0, $attempt - 1)));
+
+        usleep($delay * 1000);
     }
 
     protected function buildUrl(string $path, array $query = []): string

@@ -67,6 +67,8 @@ a {
 .site-header__nav {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 10px;
 }
 
@@ -120,25 +122,25 @@ a {
 
 .language-switch {
     display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-bottom: 18px;
+    align-items: center;
+    gap: 6px;
 }
 
 .language-btn {
-    min-height: 38px;
+    min-height: 34px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 12px;
+    gap: 7px;
+    padding: 0 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.76);
     color: var(--ink);
     font-family: "DM Sans", Arial, sans-serif;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
     font-weight: 600;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .language-btn:hover,
@@ -643,31 +645,55 @@ html[dir="rtl"] body {
     font-family: Arial, Tahoma, sans-serif;
 }
 
-html[dir="rtl"] .guide-page {
+html[dir="rtl"] .site-header,
+html[dir="rtl"] .guide-page,
+html[dir="rtl"] .auth-page,
+html[dir="rtl"] .account-page,
+html[dir="rtl"] .policy-page,
+html[dir="rtl"] .site-footer {
     direction: rtl;
 }
 
 html[dir="rtl"] .guide-hero h1,
 html[dir="rtl"] .guide-section h2,
 html[dir="rtl"] .guide-note h2,
+html[dir="rtl"] .auth-card__copy h1,
+html[dir="rtl"] .account-page__header h1,
+html[dir="rtl"] .submission-preview__header h2,
+html[dir="rtl"] .empty-state h2,
+html[dir="rtl"] .policy-page h1,
+html[dir="rtl"] .policy-page h2,
+html[dir="rtl"] .policy-page h3,
 html[dir="rtl"] .shot-brand strong {
     font-family: Arial, Tahoma, sans-serif;
     line-height: 1.12;
 }
 
+html[dir="rtl"] .site-header__brand,
+html[dir="rtl"] .site-header__nav,
 html[dir="rtl"] .language-switch {
     direction: ltr;
 }
 
-html[dir="rtl"] .access-link {
+html[dir="rtl"] .access-link,
+html[dir="rtl"] .site-footer a,
+html[dir="rtl"] .preview-attachment small,
+html[dir="rtl"] .submission-preview__header p:not(.page-kicker),
+html[dir="rtl"] code {
     direction: ltr;
     unicode-bidi: isolate;
 }
 
 html[dir="rtl"] .step-card ol,
-html[dir="rtl"] .guide-note ul {
+html[dir="rtl"] .guide-note ul,
+html[dir="rtl"] .policy-page ul {
     padding-right: 20px;
     padding-left: 0;
+}
+
+html[dir="rtl"] .policy-page th,
+html[dir="rtl"] .policy-page td {
+    text-align: right;
 }
 
 .auth-page,
@@ -1404,6 +1430,7 @@ html[dir="rtl"] .guide-note ul {
 
     .site-header__nav {
         gap: 4px;
+        justify-content: flex-end;
     }
 
     .site-header__link,
@@ -1423,7 +1450,6 @@ html[dir="rtl"] .guide-note ul {
     }
 
     .language-switch {
-        justify-content: flex-start;
         overflow-x: auto;
         padding-bottom: 4px;
     }

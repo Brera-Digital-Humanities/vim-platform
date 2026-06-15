@@ -140,6 +140,9 @@ if ($submission) {
         </div>
         <div class="kobo-review__section">
             <p class="flash-message static warning"><?= e($preview['error']) ?></p>
+            <?php if (!empty($preview['details'])): ?>
+                <p class="text-muted"><?= e($preview['details']) ?></p>
+            <?php endif ?>
         </div>
     </div>
 <?php else: ?>

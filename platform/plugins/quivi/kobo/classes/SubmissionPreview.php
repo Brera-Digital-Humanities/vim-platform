@@ -63,7 +63,10 @@ class SubmissionPreview
                 'raw' => $data,
             ];
         } catch (\Throwable $ex) {
-            return $this->error($ex->getMessage());
+            return $this->error(
+                trans('quivi.kobo::lang.review.errors.kobo_unavailable'),
+                $ex->getMessage()
+            );
         }
     }
 
@@ -590,11 +593,12 @@ class SubmissionPreview
         return array_keys($value) === range(0, count($value) - 1);
     }
 
-    protected function error(string $message): array
+    protected function error(string $message, ?string $details = null): array
     {
         return [
             'ok' => false,
             'error' => $message,
+            'details' => $details,
             'answers' => [],
             'attachments' => [],
             'metadata' => [],
