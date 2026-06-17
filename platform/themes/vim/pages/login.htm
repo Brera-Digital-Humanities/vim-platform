@@ -37,9 +37,9 @@ function onSetPassword()
     }
 
     $error = ['code' => trans('themes.vim::lang.auth.reset_invalid_code')];
-    [$user, $code] = $this->resolvePasswordResetCode((string) post('code'));
+    [$user, $code, $isManualCode] = $this->resolvePasswordResetCode((string) post('code'));
 
-    if (!$user || !$user->attemptResetPassword($code, post('password'))) {
+    if (!$user || !$this->attemptPasswordReset($user, $code, $isManualCode)) {
         throw new ValidationException($error);
     }
 
@@ -60,15 +60,36 @@ function resolvePasswordResetCode($submittedCode)
         [$userId, $code] = $parts;
 
         if (!strlen(trim($userId)) || !strlen(trim($code))) {
-            return [null, null];
+            return [null, null, false];
         }
 
-        return [Auth::findUserById($userId), trim($code)];
+        return [Auth::findUserById($userId), trim($code), false];
     }
 
     $user = \Winter\User\Models\User::where('reset_password_code', $submittedCode)->first();
 
-    return [$user, $submittedCode];
+    if (!$user) {
+        $user = \Winter\User\Models\User::whereRaw('TRIM(reset_password_code) = ?', [$submittedCode])->first();
+    }
+
+    return [$user, $submittedCode, true];
+}
+
+function attemptPasswordReset($user, $code, $isManualCode)
+{
+    if (!$isManualCode) {
+        return $user->attemptResetPassword($code, post('password'));
+    }
+
+    if (!hash_equals(trim((string) $user->reset_password_code), trim((string) $code))) {
+        return false;
+    }
+
+    $user->password = post('password');
+    $user->password_confirmation = post('password_confirmation');
+    $user->reset_password_code = null;
+
+    return $user->forceSave();
 }
 ==
 {% put page_title %}{{ 'themes.vim::lang.auth.page_title'|trans }}{% endput %}
