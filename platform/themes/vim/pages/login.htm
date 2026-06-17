@@ -23,7 +23,7 @@ function onSetPassword()
 {
     $minimumLength = \Winter\User\Models\User::getMinPasswordLength();
     $rules = [
-        'code' => 'required',
+        'code' => 'required|between:1,255',
         'password' => 'required|between:' . $minimumLength . ',255|confirmed',
         'password_confirmation' => 'required_with:password|between:' . $minimumLength . ',255',
     ];
@@ -37,19 +37,7 @@ function onSetPassword()
     }
 
     $error = ['code' => trans('themes.vim::lang.auth.reset_invalid_code')];
-    $parts = explode('!', (string) post('code'));
-
-    if (count($parts) !== 2) {
-        throw new ValidationException($error);
-    }
-
-    [$userId, $code] = $parts;
-
-    if (!strlen(trim($userId)) || !strlen(trim($code))) {
-        throw new ValidationException($error);
-    }
-
-    $user = Auth::findUserById($userId);
+    [$user, $code] = $this->resolvePasswordResetCode((string) post('code'));
 
     if (!$user || !$user->attemptResetPassword($code, post('password'))) {
         throw new ValidationException($error);
@@ -61,6 +49,26 @@ function onSetPassword()
 function passwordResetCodeFromQuery()
 {
     return trim((string) (get('code') ?: get('reset') ?: ''));
+}
+
+function resolvePasswordResetCode($submittedCode)
+{
+    $submittedCode = trim((string) $submittedCode);
+    $parts = explode('!', $submittedCode);
+
+    if (count($parts) === 2) {
+        [$userId, $code] = $parts;
+
+        if (!strlen(trim($userId)) || !strlen(trim($code))) {
+            return [null, null];
+        }
+
+        return [Auth::findUserById($userId), trim($code)];
+    }
+
+    $user = \Winter\User\Models\User::where('reset_password_code', $submittedCode)->first();
+
+    return [$user, $submittedCode];
 }
 ==
 {% put page_title %}{{ 'themes.vim::lang.auth.page_title'|trans }}{% endput %}
