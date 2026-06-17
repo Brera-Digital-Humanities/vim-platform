@@ -14,6 +14,53 @@ function onStart()
     if (Auth::check()) {
         return Redirect::to('/user/submissions');
     }
+
+    $this['passwordResetCode'] = $this->passwordResetCodeFromQuery();
+    $this['isPasswordReset'] = $this['passwordResetCode'] !== '';
+}
+
+function onSetPassword()
+{
+    $minimumLength = \Winter\User\Models\User::getMinPasswordLength();
+    $rules = [
+        'code' => 'required',
+        'password' => 'required|between:' . $minimumLength . ',255|confirmed',
+        'password_confirmation' => 'required_with:password|between:' . $minimumLength . ',255',
+    ];
+
+    $validation = Validator::make(post(), $rules, [
+        'password.confirmed' => trans('themes.vim::lang.auth.reset_password_mismatch'),
+    ]);
+
+    if ($validation->fails()) {
+        throw new ValidationException($validation);
+    }
+
+    $error = ['code' => trans('themes.vim::lang.auth.reset_invalid_code')];
+    $parts = explode('!', (string) post('code'));
+
+    if (count($parts) !== 2) {
+        throw new ValidationException($error);
+    }
+
+    [$userId, $code] = $parts;
+
+    if (!strlen(trim($userId)) || !strlen(trim($code))) {
+        throw new ValidationException($error);
+    }
+
+    $user = Auth::findUserById($userId);
+
+    if (!$user || !$user->attemptResetPassword($code, post('password'))) {
+        throw new ValidationException($error);
+    }
+
+    Flash::success(trans('themes.vim::lang.auth.reset_success_flash'));
+}
+
+function passwordResetCodeFromQuery()
+{
+    return trim((string) (get('code') ?: get('reset') ?: ''));
 }
 ==
 {% put page_title %}{{ 'themes.vim::lang.auth.page_title'|trans }}{% endput %}
@@ -25,37 +72,72 @@ function onStart()
             <span>{{ 'themes.vim::lang.auth.brand_tagline'|trans }}</span>
         </div>
 
-        <div class="auth-card__copy">
-            <p class="page-kicker">{{ 'themes.vim::lang.auth.kicker'|trans }}</p>
-            <h1>{{ 'themes.vim::lang.auth.title'|trans }}</h1>
-            <p>{{ 'themes.vim::lang.auth.intro'|trans }}</p>
-        </div>
+        {% if isPasswordReset %}
+            <div id="passwordResetPanel">
+                <div class="auth-card__copy">
+                    <p class="page-kicker">{{ 'themes.vim::lang.auth.reset_kicker'|trans }}</p>
+                    <h1>{{ 'themes.vim::lang.auth.reset_title'|trans }}</h1>
+                    <p>{{ 'themes.vim::lang.auth.reset_intro'|trans }}</p>
+                </div>
 
-        {{ form_ajax('onSignin', { class: 'auth-form' }) }}
-            <label for="userSigninLogin">{{ 'themes.vim::lang.auth.login_label'|trans }}</label>
-            <input
-                name="login"
-                type="text"
-                id="userSigninLogin"
-                autocomplete="username"
-                required>
+                {{ form_ajax('onSetPassword', {
+                    class: 'auth-form',
+                    'data-request-update': "'auth/password-reset-complete': '#passwordResetPanel'"
+                }) }}
+                    <input name="code" type="hidden" value="{{ passwordResetCode }}">
 
-            <label for="userSigninPassword">{{ 'themes.vim::lang.auth.password_label'|trans }}</label>
-            <input
-                name="password"
-                type="password"
-                id="userSigninPassword"
-                autocomplete="current-password"
-                required>
+                    <label for="userResetPassword">{{ 'themes.vim::lang.auth.new_password_label'|trans }}</label>
+                    <input
+                        name="password"
+                        type="password"
+                        id="userResetPassword"
+                        autocomplete="new-password"
+                        required>
 
-            {% if rememberLoginMode == 'ask' %}
-                <label class="auth-form__check">
-                    <input name="remember" type="checkbox" value="1">
-                    <span>{{ 'themes.vim::lang.auth.remember'|trans }}</span>
-                </label>
-            {% endif %}
+                    <label for="userResetPasswordConfirm">{{ 'themes.vim::lang.auth.confirm_password_label'|trans }}</label>
+                    <input
+                        name="password_confirmation"
+                        type="password"
+                        id="userResetPasswordConfirm"
+                        autocomplete="new-password"
+                        required>
 
-            <button type="submit">{{ 'themes.vim::lang.auth.submit'|trans }}</button>
-        {{ form_close() }}
+                    <button type="submit">{{ 'themes.vim::lang.auth.reset_submit'|trans }}</button>
+                {{ form_close() }}
+            </div>
+        {% else %}
+            <div class="auth-card__copy">
+                <p class="page-kicker">{{ 'themes.vim::lang.auth.kicker'|trans }}</p>
+                <h1>{{ 'themes.vim::lang.auth.title'|trans }}</h1>
+                <p>{{ 'themes.vim::lang.auth.intro'|trans }}</p>
+            </div>
+
+            {{ form_ajax('onSignin', { class: 'auth-form' }) }}
+                <label for="userSigninLogin">{{ 'themes.vim::lang.auth.login_label'|trans }}</label>
+                <input
+                    name="login"
+                    type="text"
+                    id="userSigninLogin"
+                    autocomplete="username"
+                    required>
+
+                <label for="userSigninPassword">{{ 'themes.vim::lang.auth.password_label'|trans }}</label>
+                <input
+                    name="password"
+                    type="password"
+                    id="userSigninPassword"
+                    autocomplete="current-password"
+                    required>
+
+                {% if rememberLoginMode == 'ask' %}
+                    <label class="auth-form__check">
+                        <input name="remember" type="checkbox" value="1">
+                        <span>{{ 'themes.vim::lang.auth.remember'|trans }}</span>
+                    </label>
+                {% endif %}
+
+                <button type="submit">{{ 'themes.vim::lang.auth.submit'|trans }}</button>
+            {{ form_close() }}
+        {% endif %}
     </section>
 </main>
