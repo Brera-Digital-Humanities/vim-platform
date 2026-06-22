@@ -111,8 +111,12 @@ function attemptPasswordReset($user, $code, $isManualCode)
 
                 {{ form_ajax('onSetPassword', {
                     class: 'auth-form',
-                    'data-request-update': "'auth/password-reset-complete': '#passwordResetPanel'"
+                    'data-request-update': "'auth/password-reset-complete': '#passwordResetPanel'",
+                    'data-request-error': "$('#passwordResetError').text(errorMsg).prop('hidden', false); return false;",
+                    'data-request-success': "$('#passwordResetError').prop('hidden', true).text('');"
                 }) }}
+                    <div id="passwordResetError" class="auth-form__error" role="alert" aria-live="polite" hidden></div>
+
                     <input name="code" type="hidden" value="{{ passwordResetCode }}">
 
                     <label for="userResetPassword">{{ 'themes.vim::lang.auth.new_password_label'|trans }}</label>
@@ -141,7 +145,13 @@ function attemptPasswordReset($user, $code, $isManualCode)
                 <p>{{ 'themes.vim::lang.auth.intro'|trans }}</p>
             </div>
 
-            {{ form_ajax('onSignin', { class: 'auth-form' }) }}
+            {{ form_ajax('onSignin', {
+                class: 'auth-form',
+                'data-request-error': "$('#signinError').text(errorMsg).prop('hidden', false); return false;",
+                'data-request-success': "$('#signinError').prop('hidden', true).text('');"
+            }) }}
+                <div id="signinError" class="auth-form__error" role="alert" aria-live="polite" hidden></div>
+
                 <label for="userSigninLogin">{{ 'themes.vim::lang.auth.login_label'|trans }}</label>
                 <input
                     name="login"
