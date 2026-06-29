@@ -317,20 +317,22 @@ return [
 
     'storage' => [
         'uploads' => [
-            'disk' => 'local',
+            'disk' => 's3',
             'folder' => 'uploads',
-            'path' => '/storage/app/uploads',
+            'path' => env('INFOMANIAK_S3_PUBLIC_URL') . '/uploads',
             'temporaryUrlTTL' => 3600,
         ],
+
         'media' => [
-            'disk' => 'local',
+            'disk' => 's3',
             'folder' => 'media',
-            'path' => '/storage/app/media',
+            'path' => env('INFOMANIAK_S3_PUBLIC_URL') . '/media',
         ],
+
         'resized' => [
-            'disk' => 'local',
+            'disk' => 's3',
             'folder' => 'resized',
-            'path' => '/storage/app/resized',
+            'path' => env('INFOMANIAK_S3_PUBLIC_URL') . '/resized',
         ],
     ],
 

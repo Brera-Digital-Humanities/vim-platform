@@ -39,15 +39,17 @@ return [
             'visibility' => 'public',
         ],
         's3' => [
-            'bucket' => env('AWS_BUCKET'),
             'driver' => 's3',
-            'endpoint' => env('AWS_ENDPOINT'),
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'stream_uploads' => env('AWS_S3_STREAM_UPLOADS', false),
-            'url' => env('AWS_URL'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'key' => env('INFOMANIAK_S3_KEY'),
+            'secret' => env('INFOMANIAK_S3_SECRET'),
+            'region' => env('INFOMANIAK_S3_REGION', 'us-east-1'),
+            'bucket' => env('INFOMANIAK_S3_BUCKET', 'livemuseum'),
+            'endpoint' => env('INFOMANIAK_S3_ENDPOINT', 'https://s3.pub2.infomaniak.cloud'),
+            'url' => env('INFOMANIAK_S3_PUBLIC_URL'),
+            'use_path_style_endpoint' => env('INFOMANIAK_S3_USE_PATH_STYLE_ENDPOINT', true),
+
+            // lascialo false all'inizio; lo proverei dopo
+            'stream_uploads' => env('INFOMANIAK_S3_STREAM_UPLOADS', false),
         ],
     ],
 ];
