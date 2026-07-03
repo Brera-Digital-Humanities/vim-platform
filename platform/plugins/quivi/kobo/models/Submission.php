@@ -43,4 +43,5 @@ class Submission extends Model
      */
     public $rules = [
     ];
+
 }

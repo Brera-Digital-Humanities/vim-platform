@@ -27,16 +27,18 @@ class SubmissionPreview
 
     protected Api $api;
     protected ?string $mediaUrlBase;
+    protected ?string $externalFileUrlBase;
 
-    public function __construct(?Api $api = null, ?string $mediaUrlBase = null)
+    public function __construct(?Api $api = null, ?string $mediaUrlBase = null, ?string $externalFileUrlBase = null)
     {
         $this->api = $api ?: Api::make();
         $this->mediaUrlBase = $mediaUrlBase;
+        $this->externalFileUrlBase = $externalFileUrlBase;
     }
 
-    public static function make(?Api $api = null, ?string $mediaUrlBase = null): self
+    public static function make(?Api $api = null, ?string $mediaUrlBase = null, ?string $externalFileUrlBase = null): self
     {
-        return new self($api, $mediaUrlBase);
+        return new self($api, $mediaUrlBase, $externalFileUrlBase);
     }
 
     public function build(Submission $submission): array
@@ -102,6 +104,20 @@ class SubmissionPreview
                 'Cache-Control' => 'private, max-age=300',
             ],
         ];
+    }
+
+    public function findExternalFile(Submission $submission, string $fileId): ?array
+    {
+        $data = $this->loadSubmissionData($submission);
+        $flatData = $this->flattenSubmission($data);
+
+        foreach ($this->extractExternalFiles($flatData) as $file) {
+            if (($file['file_id'] ?? null) === $fileId) {
+                return $file;
+            }
+        }
+
+        return null;
     }
 
     protected function loadSubmissionData(Submission $submission): array
@@ -216,6 +232,10 @@ class SubmissionPreview
                 continue;
             }
 
+            if ($this->isExternalFileKey($key)) {
+                continue;
+            }
+
             $field = $this->findField($key, $fields);
 
             if ($this->shouldHideAnswer($field)) {
@@ -263,6 +283,26 @@ class SubmissionPreview
             ];
         }
 
+        foreach ($this->extractExternalFiles($flatData) as $file) {
+            $field = $this->findField((string) ($file['field'] ?? ''), $fields);
+            $filename = (string) ($file['name'] ?? 'external-file');
+            $mime = (string) ($file['mime_type'] ?? $this->attachmentMime([], $filename));
+
+            $attachments[] = [
+                'index' => 'external-' . ($file['file_id'] ?? count($attachments)),
+                'source' => 'external',
+                'file_id' => $file['file_id'] ?? null,
+                'filename' => $filename,
+                'label' => $field['label'] ?? $filename,
+                'mime' => $mime,
+                'kind' => $this->externalFileKind($file, $filename, $mime),
+                'url' => $this->externalFileUrl($submission, (string) ($file['file_id'] ?? '')),
+                'size' => $file['size_bytes'] ?? null,
+                'status' => $file['status'] ?? null,
+                'provider' => $file['provider'] ?? null,
+            ];
+        }
+
         return $attachments;
     }
 
@@ -273,6 +313,15 @@ class SubmissionPreview
         }
 
         return Backend::url('quivi/kobo/submissions/media/' . $submission->id . '/' . $index);
+    }
+
+    protected function externalFileUrl(Submission $submission, string $fileId): string
+    {
+        if ($this->externalFileUrlBase) {
+            return rtrim($this->externalFileUrlBase, '/') . '/' . $submission->id . '/' . rawurlencode($fileId);
+        }
+
+        return Backend::url('quivi/kobo/submissions/external/' . $submission->id . '/' . rawurlencode($fileId));
     }
 
     protected function buildMetadata(array $data): array
@@ -297,6 +346,55 @@ class SubmissionPreview
     {
         $attachments = $data['_attachments'] ?? [];
         return is_array($attachments) ? array_values($attachments) : [];
+    }
+
+    protected function extractExternalFiles(array $flatData): array
+    {
+        $files = [];
+
+        foreach ($flatData as $key => $value) {
+            if (!$this->isExternalFileKey($key) || !is_string($value) || trim($value) === '') {
+                continue;
+            }
+
+            $decoded = json_decode($value, true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+
+            $fieldName = basename(str_replace('\\', '/', $key));
+
+            if (isset($decoded['files']) && is_array($decoded['files'])) {
+                foreach ($decoded['files'] as $file) {
+                    if (is_array($file) && $this->isValidExternalFile($file)) {
+                        $files[] = $this->normalizeExternalFile($file, $fieldName);
+                    }
+                }
+                continue;
+            }
+
+            if ($this->isValidExternalFile($decoded)) {
+                $files[] = $this->normalizeExternalFile($decoded, $fieldName);
+            }
+        }
+
+        return $files;
+    }
+
+    protected function isValidExternalFile(array $file): bool
+    {
+        return !empty($file['file_id'])
+            && !empty($file['key'])
+            && (($file['status'] ?? null) === 'uploaded' || !empty($file['uploaded_at']));
+    }
+
+    protected function normalizeExternalFile(array $file, string $fieldName): array
+    {
+        $file['field'] = $file['field'] ?? $fieldName;
+        $file['name'] = basename(str_replace('\\', '/', (string) ($file['name'] ?? $file['file_id'] ?? 'external-file')));
+        $file['mime_type'] = $file['mime_type'] ?? $this->attachmentMime([], $file['name']);
+
+        return $file;
     }
 
     protected function flattenSubmission(array $data, string $prefix = ''): array
@@ -569,6 +667,29 @@ class SubmissionPreview
         return 'file';
     }
 
+    protected function externalFileKind(array $file, string $filename, string $mime): string
+    {
+        $kind = (string) ($file['kind'] ?? '');
+
+        if (in_array($kind, ['image', 'audio', 'video', 'file'], true)) {
+            return $kind;
+        }
+
+        if (str_starts_with($mime, 'image/')) {
+            return 'image';
+        }
+
+        if (str_starts_with($mime, 'audio/')) {
+            return 'audio';
+        }
+
+        if (str_starts_with($mime, 'video/')) {
+            return 'video';
+        }
+
+        return $this->attachmentKind([], $filename);
+    }
+
     protected function isMetaKey(string $key): bool
     {
         if (in_array($key, self::META_KEYS, true)) {
@@ -576,6 +697,13 @@ class SubmissionPreview
         }
 
         return str_starts_with($key, '_') || str_starts_with($key, '__');
+    }
+
+    protected function isExternalFileKey(string $key): bool
+    {
+        $name = basename(str_replace('\\', '/', $key));
+
+        return str_starts_with($name, 'xfile_') || str_starts_with($name, 'xfiles_');
     }
 
     protected function isEmptyValue(mixed $value): bool

@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Composer CLI (per create-project)
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+COPY docker/uploads.ini /usr/local/etc/php/conf.d/vim-uploads.ini
 
 RUN a2enmod rewrite headers expires auth_basic authn_file
 

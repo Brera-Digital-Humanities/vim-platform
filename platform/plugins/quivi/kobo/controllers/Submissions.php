@@ -2,8 +2,10 @@
 
 use Backend\Classes\Controller;
 use BackendMenu;
+use Quivi\Kobo\Classes\ExternalFileStorage;
 use Quivi\Kobo\Classes\SubmissionPreview;
 use Quivi\Kobo\Models\Submission;
+use Redirect;
 use Symfony\Component\HttpFoundation\Response;
 
 class Submissions extends Controller
@@ -34,5 +36,25 @@ class Submissions extends Controller
         }
 
         return new Response($media['body'], 200, $media['headers']);
+    }
+
+    public function external($recordId = null, $fileId = null)
+    {
+        $submission = Submission::find($recordId);
+
+        if (!$submission) {
+            return new Response(trans('quivi.kobo::lang.review.errors.submission_not_found'), 404, ['Content-Type' => 'text/plain']);
+        }
+
+        try {
+            $file = SubmissionPreview::make()->findExternalFile($submission, (string) $fileId);
+            if (!$file) {
+                return new Response(trans('quivi.kobo::lang.review.errors.external_file_not_found'), 404, ['Content-Type' => 'text/plain']);
+            }
+
+            return Redirect::away((new ExternalFileStorage())->temporaryDownloadUrl($file));
+        } catch (\Throwable $ex) {
+            return new Response($ex->getMessage(), 500, ['Content-Type' => 'text/plain']);
+        }
     }
 }

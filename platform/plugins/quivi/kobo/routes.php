@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Quivi\Kobo\Classes\Api as KoboApi;
+use Quivi\Kobo\Classes\ExternalFileStorage;
 use Quivi\Kobo\Classes\SubmissionPreview;
 use Quivi\Kobo\Classes\SubmissionService;
 use Quivi\Kobo\Models\Submission;
@@ -12,6 +13,90 @@ use Winter\Storm\Exception\ApplicationException;
 Route::group(['prefix' => 'api/v1/kobo'], function () {
 
     Route::group(['middleware' => [JwtMiddleware::class]], function () {
+        Route::post('uploads/init', function (Request $request) {
+            try {
+                return Response::json((new ExternalFileStorage())->initUpload(
+                    $request->attributes->get('api_user'),
+                    $request->all()
+                ));
+            } catch (ApplicationException $ex) {
+                return Response::json(['error' => $ex->getMessage()], 422);
+            } catch (\Throwable $ex) {
+                return Response::json(['error' => $ex->getMessage()], 500);
+            }
+        });
+
+        Route::post('uploads/part-url', function (Request $request) {
+            try {
+                return Response::json((new ExternalFileStorage())->partUrl(
+                    $request->attributes->get('api_user'),
+                    $request->all()
+                ));
+            } catch (ApplicationException $ex) {
+                return Response::json(['error' => $ex->getMessage()], 422);
+            } catch (\Throwable $ex) {
+                return Response::json(['error' => $ex->getMessage()], 500);
+            }
+        });
+
+        Route::post('uploads/proxy-single', function (Request $request) {
+            try {
+                $payload = json_decode((string) $request->input('payload', '{}'), true) ?: [];
+
+                return Response::json((new ExternalFileStorage())->proxySingleUpload(
+                    $request->attributes->get('api_user'),
+                    $payload,
+                    $request->file('blob')
+                ));
+            } catch (ApplicationException $ex) {
+                return Response::json(['error' => $ex->getMessage()], 422);
+            } catch (\Throwable $ex) {
+                return Response::json(['error' => $ex->getMessage()], 500);
+            }
+        });
+
+        Route::post('uploads/proxy-part', function (Request $request) {
+            try {
+                $payload = json_decode((string) $request->input('payload', '{}'), true) ?: [];
+
+                return Response::json((new ExternalFileStorage())->proxyPartUpload(
+                    $request->attributes->get('api_user'),
+                    $payload,
+                    $request->file('blob')
+                ));
+            } catch (ApplicationException $ex) {
+                return Response::json(['error' => $ex->getMessage()], 422);
+            } catch (\Throwable $ex) {
+                return Response::json(['error' => $ex->getMessage()], 500);
+            }
+        });
+
+        Route::post('uploads/complete', function (Request $request) {
+            try {
+                return Response::json((new ExternalFileStorage())->completeUpload(
+                    $request->attributes->get('api_user'),
+                    $request->all()
+                ));
+            } catch (ApplicationException $ex) {
+                return Response::json(['error' => $ex->getMessage()], 422);
+            } catch (\Throwable $ex) {
+                return Response::json(['error' => $ex->getMessage()], 500);
+            }
+        });
+
+        Route::post('uploads/abort', function (Request $request) {
+            try {
+                return Response::json((new ExternalFileStorage())->abortUpload(
+                    $request->attributes->get('api_user'),
+                    $request->all()
+                ));
+            } catch (ApplicationException $ex) {
+                return Response::json(['error' => $ex->getMessage()], 422);
+            } catch (\Throwable $ex) {
+                return Response::json(['error' => $ex->getMessage()], 500);
+            }
+        });
+
         Route::post('submissions', function (Request $request) {
             if (!$request->hasFile('xml_submission_file') && !$request->input('xml_submission_file')) {
                 return Response::json(['error' => trans('quivi.kobo::lang.api.errors.xml_submission_required')], 422);
@@ -121,4 +206,30 @@ Route::get('user/submission-media/{recordId}/{attachmentIndex}', function ($reco
     }
 
     return Response::make($media['body'], 200, $media['headers']);
+})->middleware('web');
+
+Route::get('user/submission-external-file/{recordId}/{fileId}', function ($recordId, $fileId) {
+    $user = Auth::getUser();
+    if (!$user) {
+        return Response::make(trans('quivi.kobo::lang.review.errors.access_denied'), 403, ['Content-Type' => 'text/plain']);
+    }
+
+    $submission = Submission::where('id', (int) $recordId)
+        ->where('user_id', $user->id)
+        ->first();
+
+    if (!$submission) {
+        return Response::make(trans('quivi.kobo::lang.review.errors.submission_not_found'), 404, ['Content-Type' => 'text/plain']);
+    }
+
+    try {
+        $file = SubmissionPreview::make()->findExternalFile($submission, (string) $fileId);
+        if (!$file) {
+            return Response::make(trans('quivi.kobo::lang.review.errors.external_file_not_found'), 404, ['Content-Type' => 'text/plain']);
+        }
+
+        return Redirect::away((new ExternalFileStorage())->temporaryDownloadUrl($file));
+    } catch (\Throwable $ex) {
+        return Response::make($ex->getMessage(), 500, ['Content-Type' => 'text/plain']);
+    }
 })->middleware('web');

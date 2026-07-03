@@ -41,7 +41,11 @@ function onStart()
     }
 
     $this['selectedSubmission'] = $selected;
-    $this['preview'] = \Quivi\Kobo\Classes\SubmissionPreview::make(null, url('/user/submission-media'))->build($selected);
+    $this['preview'] = \Quivi\Kobo\Classes\SubmissionPreview::make(
+        null,
+        url('/user/submission-media'),
+        url('/user/submission-external-file')
+    )->build($selected);
 }
 ==
 {% put page_title %}{{ 'themes.vim::lang.account.page_title'|trans }}{% endput %}
