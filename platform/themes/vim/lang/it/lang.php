@@ -121,6 +121,7 @@
         "repositories" => "Repositories",
         "supported_by" => "Supported by",
         "partners" => "Partners",
+        "logo_band_alt" => "Loghi Unione europea, Italia Domani, Accademia di Brera e CityOpenMuseum",
         "privacy_cookie" => "Privacy and Cookie",
     ],
     "policy" => [

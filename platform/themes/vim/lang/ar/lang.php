@@ -121,6 +121,7 @@
         "repositories" => "المستودعات",
         "supported_by" => "بدعم من",
         "partners" => "الشركاء",
+        "logo_band_alt" => "شعارات الاتحاد الأوروبي وإيطاليا غدا وأكاديمية بريرا وCityOpenMuseum",
         "privacy_cookie" => "الخصوصية وملفات تعريف الارتباط",
     ],
     "policy" => [
